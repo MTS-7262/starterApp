@@ -90,23 +90,44 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-surface-0">
-      <Header />
+    <main className="relative min-h-screen overflow-x-hidden bg-[#1a2530] font-sans antialiased text-slate-100">
+      {/* Central Radial Slate Lighting Gradient */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_25%,#263545_0%,#1a2430_60%,#121b24_100%)]" />
 
-      <div className="mx-auto flex max-w-[1240px] gap-6 px-6 py-6">
-        <SearchRail onSearch={runSearch} onReset={resetSearch} onFileNew={() => setNewModalOpen(true)} loading={loading} />
-        <ResultsPanel
-          exact={exact}
-          related={related}
-          loading={loading}
-          hasSearched={hasSearched}
-          criteria={criteria}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onOpenRecord={openRecord}
-        />
+      {/* Main UI Container */}
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <Header />
+
+        <div className="mx-auto flex w-full max-w-7xl flex-1 gap-6 px-6 py-6">
+          <SearchRail
+            onSearch={runSearch}
+            onReset={resetSearch}
+            onFileNew={() => setNewModalOpen(true)}
+            loading={loading}
+          />
+          <ResultsPanel
+            exact={exact}
+            related={related}
+            loading={loading}
+            hasSearched={hasSearched}
+            criteria={criteria}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            onOpenRecord={openRecord}
+          />
+        </div>
       </div>
 
+      {/* Bottom Right Sparkle Star Accent */}
+      <svg
+        className="pointer-events-none fixed bottom-12 right-12 h-10 w-10 text-[#4c5f73]"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+      </svg>
+
+      {/* Overlays & Drawers */}
       {drawerRecord && (
         <RecordDrawer
           record={drawerRecord}

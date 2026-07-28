@@ -34,29 +34,33 @@ export default function SearchRail({
   const set = (patch: Partial<SearchQuery>) => setQ((prev) => ({ ...prev, ...patch }));
 
   const field =
-    'w-full rounded-lg border border-stroke bg-surface-2 px-3 py-2 text-[13px] text-ink-primary placeholder:text-ink-faint outline-none transition focus:border-brand/60 focus:bg-surface-3 focus:ring-2 focus:ring-brand/20';
+    'w-full rounded-lg border border-[#253342] bg-[#0e161d] px-3 py-2 text-[13px] text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/30';
 
-  const label = 'mb-1.5 mt-3.5 block text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-muted';
+  const label = 'mb-1.5 mt-3.5 block text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400';
 
   return (
-    <aside className="sticky top-[76px] h-fit w-[292px] shrink-0 rounded-xl border border-stroke bg-surface-1 p-5 shadow-panel">
+    <aside className="sticky top-[76px] h-fit w-[300px] shrink-0 rounded-2xl border border-[#293847] bg-[#16212b] p-5 shadow-2xl">
+      {/* Header */}
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="font-display text-[15px] font-semibold text-ink-primary">Search the Vault</h2>
+        <h2 className="font-sans text-[15px] font-bold text-slate-100">Search the Vault</h2>
         <button
           type="button"
           onClick={() => {
             setQ(emptyQuery);
             onReset();
           }}
-          className="text-[11.5px] font-medium text-ink-muted transition hover:text-brand-bright"
+          className="text-[12px] font-normal text-slate-400 transition hover:text-slate-200"
         >
           Reset
         </button>
       </div>
-      <p className="mb-1 text-[11.5px] leading-snug text-ink-muted">
+
+      {/* Subtitle */}
+      <p className="mb-3 text-[11.5px] leading-snug text-slate-400">
         Search by identifier for an exact hit, or leave fields loose to surface related starters nearby.
       </p>
 
+      {/* Address */}
       <label className={label} htmlFor="s-address">
         Address
       </label>
@@ -68,8 +72,14 @@ export default function SearchRail({
         onChange={(e) => set({ address: e.target.value })}
       />
 
-      <div className="rail-divider my-3.5 text-[10px] uppercase tracking-[0.1em]">or</div>
+      {/* OR Divider */}
+      <div className="my-4 flex items-center gap-3">
+        <div className="h-[1px] flex-1 bg-[#253342]" />
+        <span className="text-[10px] font-semibold tracking-widest text-slate-400 uppercase">OR</span>
+        <div className="h-[1px] flex-1 bg-[#253342]" />
+      </div>
 
+      {/* State / County / Zip */}
       <div className="grid grid-cols-3 gap-2">
         <div>
           <label className={label} htmlFor="s-state">
@@ -91,16 +101,19 @@ export default function SearchRail({
         </div>
       </div>
 
+      {/* APN */}
       <label className={label} htmlFor="s-apn">
         APN
       </label>
       <input id="s-apn" className={field} placeholder="Parcel number" value={q.apn} onChange={(e) => set({ apn: e.target.value })} />
 
+      {/* Assessed Owner */}
       <label className={label} htmlFor="s-owner">
         Assessed owner
       </label>
       <input id="s-owner" className={field} placeholder="Owner name" value={q.owner} onChange={(e) => set({ owner: e.target.value })} />
 
+      {/* Subdivision / Tract */}
       <label className={label} htmlFor="s-sub">
         Subdivision / tract
       </label>
@@ -112,6 +125,7 @@ export default function SearchRail({
         onChange={(e) => set({ subdivision: e.target.value })}
       />
 
+      {/* Block / Lot */}
       <div className="grid grid-cols-2 gap-2">
         <div>
           <label className={label} htmlFor="s-block">
@@ -127,37 +141,43 @@ export default function SearchRail({
         </div>
       </div>
 
+      {/* Starter Type */}
       <label className={label}>Starter type</label>
       <div className="mt-1.5 flex gap-1.5">
-        {TYPES.map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => set({ type: t })}
-            className={`flex-1 rounded-md border px-2 py-1.5 text-[11.5px] font-medium transition ${
-              q.type === t
-                ? 'border-brand/50 bg-brand-soft text-brand-bright'
-                : 'border-stroke bg-surface-2 text-ink-secondary hover:border-stroke-strong hover:text-ink-primary'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+        {TYPES.map((t) => {
+          const isSelected = q.type === t;
+          return (
+            <button
+              key={t}
+              type="button"
+              onClick={() => set({ type: t })}
+              className={`flex-1 rounded-lg px-2 py-1.5 text-[11.5px] font-medium transition ${
+                isSelected
+                  ? 'border border-teal-500/50 bg-[#18646e] text-cyan-50 shadow-sm'
+                  : 'border border-[#253342] bg-[#1a2530] text-slate-300 hover:border-slate-500 hover:text-slate-100'
+              }`}
+            >
+              {t}
+            </button>
+          );
+        })}
       </div>
 
+      {/* Primary Action */}
       <button
         type="button"
         disabled={loading}
         onClick={() => onSearch(q)}
-        className="mt-5 w-full rounded-lg bg-gradient-to-b from-brand-bright to-brand py-2.5 text-[13px] font-semibold text-white shadow-glow transition hover:brightness-110 disabled:opacity-50 disabled:shadow-none"
+        className="mt-5 w-full rounded-xl bg-[#165a63] py-2.5 text-[13px] font-semibold text-cyan-50 shadow-md transition hover:bg-[#1b6b76] active:scale-[0.99] disabled:opacity-50"
       >
         {loading ? 'Searching…' : 'Search Vault'}
       </button>
 
+      {/* Secondary Action */}
       <button
         type="button"
         onClick={onFileNew}
-        className="mt-2.5 w-full rounded-lg border border-dashed border-stroke-strong bg-transparent py-2 text-[12px] font-semibold text-ink-secondary transition hover:border-brand/50 hover:text-brand-bright"
+        className="mt-2.5 w-full rounded-xl border border-dashed border-teal-500/50 bg-teal-950/20 py-2 text-[12px] font-semibold text-teal-300 transition hover:border-teal-400 hover:bg-teal-900/30 hover:text-teal-200"
       >
         + File a New Starter
       </button>

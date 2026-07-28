@@ -1,9 +1,9 @@
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-stroke bg-[#334155] backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-[1240px] items-center justify-between px-6">
+    <header className="sticky top-0 z-40 bg-[#334155] backdrop-blur-md shadow-sm">
+      <div className="mx-auto flex h-14 max-w-310 items-center justify-between px-6">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5"> 
             <span className="grid h-7 w-7 place-items-center rounded-[7px] bg-[#1E293B] from-brand-bright to-brand-dim font-display text-[13px] font-bold text-white shadow-glow">
               P
             </span>
