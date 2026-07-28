@@ -49,13 +49,13 @@ export default function Home() {
     setCriteria(summarize(query));
     setLastQuery(query);
     try {
-      // const res = await fetch('/api/search', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(query)
-      // });
-      // const data = await res.json();
-      var data = getallTestData();
+      const res = await fetch('http://localhost:3000/starter', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await res.json();
+      
       setExact(data.exact || []);
       setRelated(data.related || []);
       setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
