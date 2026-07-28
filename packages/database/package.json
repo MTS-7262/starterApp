@@ -1,22 +1,26 @@
 {
   "name": "@repo/database",
   "version": "1.0.0",
-  "main": "./generated/client/index.js",
-  "types": "./generated/client/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./generated/client/index.d.ts",
-      "default": "./generated/client/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
-    "db:generate": "prisma generate",
+    "build": "tsc",
+    "db:generate": "prisma generate && tsc",
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
-    "@prisma/client": "^7.0.0"
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.0.0",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "dotenv": "^16.4.5",
     "prisma": "^7.0.0",
     "typescript": "^5.0.0"

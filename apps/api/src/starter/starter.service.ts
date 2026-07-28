@@ -1,24 +1,8 @@
-// ---------------------------------------------------------------------------
-// Data access layer. Every function below is the ONLY place the rest of the
-// app talks to storage — swap this file's internals for Prisma/Postgres,
-// Supabase, Mongo, etc. later without touching any component or API route,
-// as long as the exported function signatures (getAllRecords, getRecordById,
-// createRecord, updateRecord, deleteRecord) stay the same.
-// ---------------------------------------------------------------------------
-import fs from 'fs';
-import path from 'path';
-import { StarterRecord } from './types';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Prisma, StarterRecord } from '@repo/database';
+import { PrismaService } from 'src/prisma/prisma.service';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'records.json');
-export const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
-
-function ensureDirs() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
-
-const seed: StarterRecord[] = [
+ const SEED_DATA: Prisma.StarterRecordCreateInput[] = [
   {
     id: 'st_1001',
     type: 'Owner',
@@ -39,8 +23,7 @@ const seed: StarterRecord[] = [
     legal: 'Lot 13, Block 3, Encore at Rose Hill, according to the plat thereof recorded under Recording No. 20180412000933, records of King County, Washington.',
     notes: 'Schedule B: Easement for public utilities per instrument 8809140221. HOA assessment lien released 2023.',
     filed: true,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 400,
-    pdf: null
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 400),
   },
   {
     id: 'st_1002',
@@ -62,8 +45,7 @@ const seed: StarterRecord[] = [
     legal: 'Lot 14, Block 3, Encore at Rose Hill, according to the plat thereof recorded under Recording No. 20180412000933, records of King County, Washington.',
     notes: 'Deed of trust in favor of Meridian Home Lending, dated 2024-01-19.',
     filed: true,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 180,
-    pdf: null
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 180),
   },
   {
     id: 'st_1003',
@@ -85,8 +67,7 @@ const seed: StarterRecord[] = [
     legal: 'Lot 6, Block 1, Harborview Terrace, according to the plat thereof recorded under Recording No. 20090710000441, records of King County, Washington.',
     notes: 'Pending: satisfaction of prior deed of trust required prior to close.',
     filed: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 12,
-    pdf: null
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12),
   },
   {
     id: 'st_1004',
@@ -108,8 +89,7 @@ const seed: StarterRecord[] = [
     legal: 'Lot 9, Block 2, Overlook Estates, according to the plat thereof recorded under Recording No. 20050902000112, records of King County, Washington.',
     notes: 'Held in trust; successor trustee documentation on file.',
     filed: true,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 900,
-    pdf: null
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 900),
   },
   {
     id: 'st_1005',
@@ -131,57 +111,72 @@ const seed: StarterRecord[] = [
     legal: 'Lot 2, Block 5, Encore at Rose Hill, according to the plat thereof recorded under Recording No. 20180412000933, records of King County, Washington.',
     notes: 'Refinance; prior deed of trust reconveyed 2021-11-01.',
     filed: true,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 1000,
-    pdf: null
-  }
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1000),
+  },
 ];
 
-function readAll(): StarterRecord[] {
-  ensureDirs();
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(seed, null, 2));
-    return seed;
+@Injectable()
+export class StarterService implements OnModuleInit {
+    constructor(private readonly prisma: PrismaService) { }
+
+    async onModuleInit() {
+    await this.seedDatabase();
   }
-  try {
-    const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(raw) as StarterRecord[];
-  } catch {
-    return seed;
+
+  async seedDatabase() {
+    const count = await this.prisma.starterRecord.count();
+    if (count === 0) {
+      for (const record of SEED_DATA) {
+        await this.prisma.starterRecord.upsert({
+          where: { id: record.id },
+          update: {},
+          create: record,
+        });
+      }
+      console.log('✅ Starter records successfully seeded into the database.');
+    }
   }
-}
 
-function writeAll(records: StarterRecord[]) {
-  ensureDirs();
-  fs.writeFileSync(DB_FILE, JSON.stringify(records, null, 2));
-}
+ async create(data: Prisma.StarterRecordCreateInput): Promise<StarterRecord> {
+    return this.prisma.starterRecord.create({
+      data,
+    });
+  }
 
-export function getAllRecords(): StarterRecord[] {
-  return readAll();
-}
+  // 2. READ ALL
+  async findAll(): Promise<StarterRecord[]> {
+    return this.prisma.starterRecord.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
-export function getRecordById(id: string): StarterRecord | undefined {
-  return readAll().find((r) => r.id === id);
-}
+  // 3. READ ONE
+  async findOne(id: string): Promise<StarterRecord> {
+    const record = await this.prisma.starterRecord.findUnique({
+      where: { id },
+    });
 
-export function createRecord(record: StarterRecord): StarterRecord {
-  const all = readAll();
-  all.unshift(record);
-  writeAll(all);
-  return record;
-}
+    if (!record) {
+      throw new NotFoundException(`StarterRecord with ID "${id}" not found`);
+    }
 
-// export function updateRecord(id: string, patch: Partial<StarterRecord>): StarterRecord | null {
-//   const all = readAll();
-//   const idx = all.findIndex((r) => r.id === id);
-//   if (idx === -1) return null;
-//   all[idx] = { ...all[idx], ...patch };
-//   writeAll(all);
-//   return all[idx];
-// }
+    return record;
+  }
 
-export function deleteRecord(id: string): boolean {
-  const all = readAll();
-  const next = all.filter((r) => r.id !== id);
-  writeAll(next);
-  return next.length !== all.length;
+  // 4. UPDATE
+  async update(id: string, data: Prisma.StarterRecordUpdateInput): Promise<StarterRecord> {
+    await this.findOne(id); // Ensure record exists
+    return this.prisma.starterRecord.update({
+      where: { id },
+      data,
+    });
+  }
+
+  // 5. DELETE
+  async remove(id: string): Promise<StarterRecord> {
+    await this.findOne(id); // Ensure record exists
+    return this.prisma.starterRecord.delete({
+      where: { id },
+    });
+  }
 }

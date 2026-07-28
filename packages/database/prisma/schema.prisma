@@ -7,12 +7,36 @@ datasource db {
   provider = "postgresql"
 }
 
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model StarterRecord {
+  id          String   @id @default(cuid())
+  type        String
+  address     String?
+  city        String?
+  state       String?
+  county      String?
+  zip         String?
+  apn         String?
+  owner       String?
+  subdivision String?
+  block       String?
+  lot         String?
+  titleco     String?  @map("title_co")
+  amount      String?
+  policy      String?
+  date        String?
+  legal       String?
+  notes       String?
+  filed       Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  pdf         Json?
+
+  latitude    Float?
+  longitude   Float?
+  exowners    String[]
+
+  // Indexes for high-performance searching
+  @@index([owner])
+  @@index([apn])
+  @@index([address])
+  @@map("starter_records")
 }
