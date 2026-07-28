@@ -39,17 +39,18 @@ export default function SearchRail({
   const label = 'mb-1.5 mt-3.5 block text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400';
 
   return (
-    <aside className="sticky top-[76px] h-fit w-[300px] shrink-0 rounded-2xl border border-[#293847] bg-[#16212b] p-5 shadow-2xl">
+    <aside className="sticky top-19 h-fit w-75 shrink-0 rounded-2xl border border-[#293847] bg-[#16212b] p-5 shadow-2xl drop-shadow-[0_0_1px_rgba(45,212,191,0.4)]">
       {/* Header */}
       <div className="mb-1 flex items-center justify-between">
         <h2 className="font-sans text-[15px] font-bold text-slate-100">Search the Vault</h2>
+
         <button
           type="button"
           onClick={() => {
             setQ(emptyQuery);
             onReset();
           }}
-          className="text-[12px] font-normal text-slate-400 transition hover:text-slate-200"
+          className="mt-2.5 w-20 rounded-xl border border-dashed border-gray-500/50 bg-teal-950/20 py-2 text-[12px] font-semibold text-gray-300 transition hover:border-gray-400 hover:bg-teal-900/30 hover:text-gray-200"
         >
           Reset
         </button>
@@ -74,9 +75,9 @@ export default function SearchRail({
 
       {/* OR Divider */}
       <div className="my-4 flex items-center gap-3">
-        <div className="h-[1px] flex-1 bg-[#253342]" />
+        <div className="h-px flex-1 bg-[#253342]" />
         <span className="text-[10px] font-semibold tracking-widest text-slate-400 uppercase">OR</span>
-        <div className="h-[1px] flex-1 bg-[#253342]" />
+        <div className="h-px flex-1 bg-[#253342]" />
       </div>
 
       {/* State / County / Zip */}

@@ -5,18 +5,18 @@
 // as long as the exported function signatures (getAllRecords, getRecordById,
 // createRecord, updateRecord, deleteRecord) stay the same.
 // ---------------------------------------------------------------------------
-import fs from 'fs';
-import path from 'path';
-import { StarterRecord } from './types';
+// import fs from 'fs';
+// import path from 'path';
+import { MatchedRecord, StarterRecord } from './types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'records.json');
-export const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
+// const DATA_DIR = path.join(process.cwd(), 'data');
+// const DB_FILE = path.join(DATA_DIR, 'records.json');
+// export const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 
-function ensureDirs() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
+// function ensureDirs() {
+//   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+//   if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+// }
 
 const seed: StarterRecord[] = [
   {
@@ -136,52 +136,92 @@ const seed: StarterRecord[] = [
   }
 ];
 
-function readAll(): StarterRecord[] {
-  ensureDirs();
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(seed, null, 2));
-    return seed;
+// function readAll(): StarterRecord[] {
+//   ensureDirs();
+//   if (!fs.existsSync(DB_FILE)) {
+//     fs.writeFileSync(DB_FILE, JSON.stringify(seed, null, 2));
+//     return seed;
+//   }
+//   try {
+//     const raw = fs.readFileSync(DB_FILE, 'utf-8');
+//     return JSON.parse(raw) as StarterRecord[];
+//   } catch {
+//     return seed;
+//   }
+// }
+export function getallTestData(): { exact: MatchedRecord[]; related: MatchedRecord[] } {
+  const records = seed; // readAll(); // Use seed data for testing instead of reading from file
+
+  const exact: MatchedRecord[] = records
+    .filter((r) => r.filed)
+    .map((r) => ({
+      ...r,
+      tier: 'exact',
+      matchedOn: ['address', 'apn']
+    }));
+
+  const related: MatchedRecord[] = records
+    .filter((r) => !r.filed)
+    .map((r) => ({
+      ...r,
+      tier: 'related',
+      matchedOn: ['subdivision', 'county']
+    }));
+
+  return { exact, related };
+}
+
+
+
+export function getbyId(id: string): MatchedRecord {
+  const records = seed;
+
+  const record = records.find((r) => r.id === id);
+
+  if (!record) {
+    throw new Error(`Record with id ${id} not found`);
   }
-  try {
-    const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(raw) as StarterRecord[];
-  } catch {
-    return seed;
-  }
+
+  const response: MatchedRecord = {
+    ...record,
+    tier: record.filed ? 'exact' : 'related',
+    matchedOn: ['id']
+  };
+  return response;
 }
 
-function writeAll(records: StarterRecord[]) {
-  ensureDirs();
-  fs.writeFileSync(DB_FILE, JSON.stringify(records, null, 2));
-}
-
-export function getAllRecords(): StarterRecord[] {
-  return readAll();
-}
-
-export function getRecordById(id: string): StarterRecord | undefined {
-  return readAll().find((r) => r.id === id);
-}
-
-export function createRecord(record: StarterRecord): StarterRecord {
-  const all = readAll();
-  all.unshift(record);
-  writeAll(all);
-  return record;
-}
-
-// export function updateRecord(id: string, patch: Partial<StarterRecord>): StarterRecord | null {
-//   const all = readAll();
-//   const idx = all.findIndex((r) => r.id === id);
-//   if (idx === -1) return null;
-//   all[idx] = { ...all[idx], ...patch };
-//   writeAll(all);
-//   return all[idx];
+// function writeAll(records: StarterRecord[]) {
+//   ensureDirs();
+//   fs.writeFileSync(DB_FILE, JSON.stringify(records, null, 2));
 // }
 
-export function deleteRecord(id: string): boolean {
-  const all = readAll();
-  const next = all.filter((r) => r.id !== id);
-  writeAll(next);
-  return next.length !== all.length;
-}
+// export function getAllRecords(): StarterRecord[] {
+//   return readAll();
+// }
+
+// export function getRecordById(id: string): StarterRecord | undefined {
+//   return readAll().find((r) => r.id === id);
+// }
+
+// export function createRecord(record: StarterRecord): StarterRecord {
+//   const all = readAll();
+//   all.unshift(record);
+//   writeAll(all);
+//   return record;
+// }
+
+// // export function updateRecord(id: string, patch: Partial<StarterRecord>): StarterRecord | null {
+// //   const all = readAll();
+// //   const idx = all.findIndex((r) => r.id === id);
+// //   if (idx === -1) return null;
+// //   all[idx] = { ...all[idx], ...patch };
+// //   writeAll(all);
+// //   return all[idx];
+// // }
+
+// export function deleteRecord(id: string): boolean {
+//   const all = readAll();
+//   const next = all.filter((r) => r.id !== id);
+//   writeAll(next);
+//   return next.length !== all.length;
+// }

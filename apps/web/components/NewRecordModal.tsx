@@ -69,7 +69,7 @@ export default function NewRecordModal({
       className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="pop-in max-h-[88vh] w-full max-w-[560px] overflow-y-auto rounded-2xl border border-[#293847] bg-[#16212b] p-6 shadow-2xl">
+      <div className="pop-in max-h-[88vh] w-full max-w-140 overflow-y-auto rounded-2xl border border-[#293847] bg-[#16212b] p-6 shadow-2xl drop-shadow-[0_0_5px_rgba(45,212,191,0.4)]">
         {/* Header */}
         <div className="mb-1 flex items-center justify-between">
           <h3 className="font-sans text-[17px] font-bold text-slate-100">File a New Starter</h3>

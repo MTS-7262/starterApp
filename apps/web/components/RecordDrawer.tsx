@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { StarterRecord } from '../lib/types';
+import StampBadge from './StampBadge';
 
 function fmtMoney(v: string) {
   if (!v) return '—';
@@ -19,8 +20,20 @@ function fmtBytes(n: number) {
 function Field({ k, v }: { k: string; v: string }) {
   return (
     <div>
-      <div className="text-[9.5px] uppercase tracking-[0.08em] text-ink-muted">{k}</div>
-      <div className="mt-0.5 text-[13.5px] text-ink-primary">{v || '—'}</div>
+      <div className="text-[9.5px] font-bold uppercase tracking-[0.08em] text-slate-400">
+        {k}
+      </div>
+      <div className="mt-0.5 truncate text-[13.5px] font-medium text-slate-200">
+        {v || '—'}
+      </div>
+    </div>
+  );
+}
+
+function SectionDivider({ title }: { title: string }) {
+  return (
+    <div className="mb-3 mt-6 border-b border-[#253342] pb-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
+      {title}
     </div>
   );
 }
@@ -87,62 +100,77 @@ export default function RecordDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="pop-in flex h-full w-full max-w-[480px] flex-col overflow-y-auto border-l border-stroke bg-surface-1 shadow-popover">
-        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-stroke bg-surface-1/95 px-6 py-5 backdrop-blur">
+      <div className="flex h-full w-full max-w-[480px] flex-col overflow-y-auto border-l border-[#253342] bg-[#111a22] text-slate-100 shadow-2xl">
+        {/* Drawer Header */}
+        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-[#253342] bg-[#111a22]/95 px-6 py-5 backdrop-blur">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-muted">
-              {record.type} · {record.id}
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-slate-400">
+              <span>{record.type}</span>
+              <span>·</span>
+              <span>{record.id}</span>
             </div>
-            <h2 className="font-display text-[18px] font-semibold text-ink-primary">{record.address || 'Untitled starter'}</h2>
+            <h2 className="mt-1 font-sans text-[18px] font-bold leading-snug text-slate-100">
+              {record.address || 'Untitled starter'}
+            </h2>
           </div>
-          <button
-            onClick={onClose}
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-stroke text-ink-muted transition hover:border-stroke-strong hover:text-ink-primary"
-            aria-label="Close"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-3">
+            <StampBadge
+              label={record.pdf ? 'Filed' : 'Pending PDF'}
+              tone={record.pdf ? 'filed' : 'pending'}
+            />
+            <button
+              onClick={onClose}
+              className="grid h-8 w-8 place-items-center rounded-full border border-[#253342] bg-[#16212b] text-slate-400 transition hover:border-slate-500 hover:text-slate-100"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
+        {/* Drawer Body */}
         <div className="flex-1 px-6 py-5">
-          {/* PDF panel — the core action of this drawer */}
-          <div className="rail-divider mb-3 text-[10px] uppercase tracking-[0.1em]">Filed Document</div>
-          <div className="rounded-xl border border-stroke bg-surface-2 p-4 shadow-card">
+          {/* PDF Panel */}
+          <SectionDivider title="Filed Document" />
+          <div className="rounded-xl border border-[#253342] bg-[#16212b] p-4 shadow-lg">
             {record.pdf ? (
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="grid h-11 w-9 shrink-0 place-items-center rounded-md border border-brand/30 bg-brand-soft font-mono text-[9px] font-bold text-brand-bright">
+                  <div className="grid h-11 w-10 shrink-0 place-items-center rounded-lg border border-teal-500/30 bg-teal-950/60 font-mono text-[10px] font-bold text-teal-300">
                     PDF
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13.5px] font-medium text-ink-primary">{record.pdf.originalName}</div>
-                    <div className="font-mono text-[10.5px] text-ink-muted">
-                      {fmtBytes(record.pdf.size)} · filed {new Date(record.pdf.uploadedAt).toLocaleDateString()}
+                    <div className="truncate text-[13.5px] font-semibold text-slate-100">
+                      {record.pdf.originalName}
+                    </div>
+                    <div className="mt-0.5 font-mono text-[10.5px] text-slate-400">
+                      {fmtBytes(record.pdf.size)} · filed{' '}
+                      {new Date(record.pdf.uploadedAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-4 flex gap-2">
                   <a
                     href={`/api/pdf/${record.id}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 rounded-lg bg-gradient-to-b from-brand-bright to-brand py-2 text-center text-[12.5px] font-semibold text-white shadow-glow transition hover:brightness-110"
+                    className="flex-1 rounded-lg bg-teal-600 py-2 text-center text-[12.5px] font-semibold text-white shadow-[0_0_12px_rgba(45,212,191,0.25)] transition hover:bg-teal-500"
                   >
                     View PDF
                   </a>
                   <button
                     onClick={() => fileInput.current?.click()}
                     disabled={uploading}
-                    className="flex-1 rounded-lg border border-stroke bg-surface-3 py-2 text-[12.5px] font-semibold text-ink-primary transition hover:border-stroke-strong disabled:opacity-60"
+                    className="flex-1 rounded-lg border border-[#253342] bg-[#1e2c3a] py-2 text-[12.5px] font-semibold text-slate-200 transition hover:border-slate-500 disabled:opacity-60"
                   >
                     {uploading ? 'Uploading…' : 'Replace'}
                   </button>
                   <button
                     onClick={removePdf}
-                    className="rounded-lg border border-stroke px-3 text-[12.5px] font-semibold text-danger transition hover:border-danger/40 hover:bg-danger-soft"
+                    className="rounded-lg border border-red-500/30 bg-red-950/40 px-3 text-[12.5px] font-semibold text-red-400 transition hover:border-red-500/60 hover:bg-red-900/50"
                   >
                     Remove
                   </button>
@@ -156,14 +184,18 @@ export default function RecordDrawer({
                   const f = e.dataTransfer.files?.[0];
                   if (f) handleFile(f);
                 }}
-                className="flex flex-col items-center justify-center rounded-lg border border-dashed border-stroke-strong bg-surface-1/60 px-4 py-6 text-center"
+                className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#253342] bg-[#0d141b] px-4 py-6 text-center"
               >
-                <p className="text-[13px] text-ink-primary">No PDF filed against this starter yet.</p>
-                <p className="mt-0.5 text-[11.5px] text-ink-muted">Drag a PDF here, or</p>
+                <p className="text-[13px] font-medium text-slate-200">
+                  No PDF filed against this starter yet.
+                </p>
+                <p className="mt-0.5 text-[11.5px] text-slate-400">
+                  Drag a PDF here, or
+                </p>
                 <button
                   onClick={() => fileInput.current?.click()}
                   disabled={uploading}
-                  className="mt-3 rounded-lg bg-gradient-to-b from-brand-bright to-brand px-4 py-2 text-[12.5px] font-semibold text-white shadow-glow transition hover:brightness-110 disabled:opacity-60"
+                  className="mt-3 rounded-lg bg-teal-600 px-4 py-2 text-[12.5px] font-semibold text-white shadow-[0_0_12px_rgba(45,212,191,0.25)] transition hover:bg-teal-500 disabled:opacity-60"
                 >
                   {uploading ? 'Uploading…' : 'Upload PDF'}
                 </button>
@@ -179,43 +211,60 @@ export default function RecordDrawer({
                 if (f) handleFile(f);
               }}
             />
-            {error && <p className="mt-2 text-[12px] text-danger">{error}</p>}
+            {error && <p className="mt-2 text-[12px] text-red-400">{error}</p>}
           </div>
 
-          <div className="rail-divider mb-3 mt-6 text-[10px] uppercase tracking-[0.1em]">Property Details</div>
+          {/* Property Details */}
+          <SectionDivider title="Property Details" />
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <Field k="Address" v={record.address} />
             <Field k="APN" v={record.apn} />
             <Field k="Assessed Owner" v={record.owner} />
             <Field k="Title Company" v={record.titleco} />
-            <Field k="City / State" v={[record.city, record.state].filter(Boolean).join(', ')} />
-            <Field k="County / Zip" v={[record.county, record.zip].filter(Boolean).join(' · ')} />
+            <Field
+              k="City / State"
+              v={[record.city, record.state].filter(Boolean).join(', ')}
+            />
+            <Field
+              k="County / Zip"
+              v={[record.county, record.zip].filter(Boolean).join(' · ')}
+            />
           </div>
 
-          <div className="rail-divider mb-3 mt-6 text-[10px] uppercase tracking-[0.1em]">Starter Legal</div>
-          <div className="rounded-lg border border-stroke bg-surface-2 p-3 text-[13px] leading-relaxed text-ink-secondary">
+          {/* Legal Description */}
+          <SectionDivider title="Starter Legal" />
+          <div className="rounded-lg border border-[#253342] bg-[#0d141b] p-3 text-[13px] leading-relaxed text-slate-300">
             {record.legal || 'No legal description on file.'}
           </div>
           <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
-            <Field k="Block / Lot" v={`${record.block || '—'} / ${record.lot || '—'}`} />
+            <Field
+              k="Block / Lot"
+              v={`${record.block || '—'} / ${record.lot || '—'}`}
+            />
             <Field k="Subdivision / Tract" v={record.subdivision} />
           </div>
 
-          <div className="rail-divider mb-3 mt-6 text-[10px] uppercase tracking-[0.1em]">Policy</div>
+          {/* Policy */}
+          <SectionDivider title="Policy Information" />
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <Field k="Policy / Doc No." v={record.policy} />
             <Field k="Date" v={record.date} />
             <Field k="Amount" v={fmtMoney(record.amount)} />
           </div>
 
-          <div className="rail-divider mb-3 mt-6 text-[10px] uppercase tracking-[0.1em]">Schedule B / Notes</div>
-          <div className="rounded-lg border border-stroke bg-surface-2 p-3 text-[13px] leading-relaxed text-ink-secondary">
+          {/* Notes */}
+          <SectionDivider title="Schedule B / Notes" />
+          <div className="rounded-lg border border-[#253342] bg-[#0d141b] p-3 text-[13px] leading-relaxed text-slate-300">
             {record.notes || 'No notes on file.'}
           </div>
         </div>
 
-        <div className="sticky bottom-0 flex justify-end border-t border-stroke bg-surface-1/95 px-6 py-4 backdrop-blur">
-          <button onClick={deleteRecord} className="text-[12px] font-medium text-ink-muted transition hover:text-danger">
+        {/* Drawer Footer */}
+        <div className="sticky bottom-0 flex justify-end border-t border-[#253342] bg-[#111a22]/95 px-6 py-4 backdrop-blur">
+          <button
+            onClick={deleteRecord}
+            className="text-[12px] font-semibold text-slate-400 transition hover:text-red-400"
+          >
             Delete this starter
           </button>
         </div>

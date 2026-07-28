@@ -83,18 +83,10 @@ function RecordCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between border-t border-[#253342] pt-3">
-        <div className="flex items-center gap-1.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.06em]">
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              record.pdf
-                ? 'bg-[#4ade80] shadow-[0_0_8px_#4ade80]'
-                : 'bg-slate-600'
-            }`}
-          />
-          <span className={record.pdf ? 'text-emerald-400' : 'text-slate-500'}>
-            {record.pdf ? 'PDF filed' : 'No PDF filed'}
-          </span>
-        </div>
+        <StampBadge
+          label={record.pdf ? 'PDF filed' : 'No PDF filed'}
+          tone={record.pdf ? 'filed' : 'neutral'}
+        />
         <span className="flex items-center gap-1 text-[11.5px] font-semibold text-slate-400 transition group-hover:text-teal-300">
           Open record
           <span className="transition-transform group-hover:translate-x-0.5">
@@ -129,7 +121,7 @@ export default function ResultsPanel({
   const total = exact.length + related.length;
 
   return (
-    <section className="min-w-0 flex-1 rounded-2xl border border-[#293847] bg-[#16212b] shadow-2xl overflow-hidden">
+    <section className="min-w-0 flex-1 rounded-2xl border border-[#293847] bg-[#16212b] shadow-2xl overflow-hidden drop-shadow-[0_0_1px_rgba(45,212,191,0.4)]">
       {/* Top Search Info Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#253342] px-5 py-3.5 text-[12px]">
         <div className="text-slate-400">
