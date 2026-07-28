@@ -1,6 +1,6 @@
 'use client';
 
-import { MatchedRecord, MatchTier } from '@/lib/types';
+import { MatchedRecord, MatchTier } from '../lib/types';
 import StampBadge from './StampBadge';
 
 function fmtMoney(v: string) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { StarterRecord, StarterType } from '@/lib/types';
+import { StarterRecord, StarterType } from '../lib/types';
 
 const empty = {
   type: 'Owner' as StarterType,

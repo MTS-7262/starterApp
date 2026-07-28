@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SearchQuery, StarterType } from '@/lib/types';
+import { SearchQuery, StarterType } from '../lib/types';
 
 const TYPES: (StarterType | 'All')[] = ['All', 'Owner', 'Lender', 'Commitment'];
 

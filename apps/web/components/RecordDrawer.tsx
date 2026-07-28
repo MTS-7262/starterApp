@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { StarterRecord } from '@/lib/types';
+import { StarterRecord } from '../lib/types';
 
 function fmtMoney(v: string) {
   if (!v) return '—';

@@ -12,9 +12,13 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "next": "16.2.0",
+    "postcss": "^8.5.24",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@repo/api": "workspace:*",
