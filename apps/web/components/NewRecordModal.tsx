@@ -49,7 +49,7 @@ export default function NewRecordModal({
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch('/api/records', {
+      const res = await fetch('http://localhost:3000/starter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -60,7 +60,7 @@ export default function NewRecordModal({
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setSaving(false);
+      // setSaving(false);
     }
   }
 
