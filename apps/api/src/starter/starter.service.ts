@@ -3,7 +3,6 @@ import { MatchedRecord, MatchTier, SearchQuery, StarterFilterResponse, StarterTy
 import { Prisma, StarterRecord } from '@repo/database';
 import { PrismaService } from 'src/prisma/prisma.service';
 
-
 const FIRST_NAMES = [
   'Marguerite', 'Theo', 'Priya', 'Declan', 'Owen', 'Sarah', 'Marcus', 'Elena',
   'David', 'Sophia', 'James', 'Aisha', 'Carlos', 'Emily', 'Vikram', 'Rachel',
@@ -16,15 +15,16 @@ const LAST_NAMES = [
   'Reynolds', 'Mercer', 'Zhao', 'Thorne'
 ];
 
-const LOCATIONS = [
-  { city: 'Kirkland', county: 'King', zip: '98033' },
-  { city: 'Bellevue', county: 'King', zip: '98004' },
-  { city: 'Seattle', county: 'King', zip: '98101' },
-  { city: 'Redmond', county: 'King', zip: '98052' },
-  { city: 'Renton', county: 'King', zip: '98055' },
-  { city: 'Tacoma', county: 'Pierce', zip: '98402' },
-  { city: 'Bothell', county: 'Snohomish', zip: '98012' },
-  { city: 'Woodinville', county: 'King', zip: '98072' },
+// Base coordinates typed as floats (number)
+const LOCATIONS: { city: string; county: string; zip: string; lat: number; lng: number }[] = [
+  { city: 'Kirkland', county: 'King', zip: '98033', lat: 47.6768, lng: -122.2060 },
+  { city: 'Bellevue', county: 'King', zip: '98004', lat: 47.6101, lng: -122.2015 },
+  { city: 'Seattle', county: 'King', zip: '98101', lat: 47.6062, lng: -122.3321 },
+  { city: 'Redmond', county: 'King', zip: '98052', lat: 47.6740, lng: -122.1215 },
+  { city: 'Renton', county: 'King', zip: '98055', lat: 47.4829, lng: -122.2171 },
+  { city: 'Tacoma', county: 'Pierce', zip: '98402', lat: 47.2529, lng: -122.4443 },
+  { city: 'Bothell', county: 'Snohomish', zip: '98012', lat: 47.7601, lng: -122.2054 },
+  { city: 'Woodinville', county: 'King', zip: '98072', lat: 47.7543, lng: -122.0800 },
 ];
 
 const STREET_NAMES = [
@@ -53,9 +53,11 @@ const NOTES_TEMPLATES = [
   'Standard owner policy coverage without exceptions.',
   'Subject to CC&Rs recorded under King County recording no.'
 ];
+
 function getRandom<T>(list: T[]): T {
   return list[Math.floor(Math.random() * list.length)];
 }
+
 function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[] {
   const records: Prisma.StarterRecordCreateInput[] = [];
 
@@ -66,7 +68,7 @@ function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[
     const address = `${streetNum} ${getRandom(STREET_NAMES)}`;
 
     const types: ('Owner' | 'Lender' | 'Commitment')[] = ['Owner', 'Lender', 'Commitment'];
-    const type = types[i % 3]; // Rotates evenly across types
+    const type = types[i % 3];
 
     const year = 2020 + (i % 6);
     const monthNum = (i % 12) + 1;
@@ -97,6 +99,14 @@ function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[
     const recNo = `${year}${monthStr}${dayStr}${String(100000 + ((i * 73) % 899999))}`;
     const legal = `Lot ${lot}, Block ${block}, ${subdivision}, according to the plat thereof recorded under Recording No. ${recNo}, records of ${location.county} County, Washington.`;
 
+    // Calculate float offsets (~30-50m parcel gaps)
+    const latOffset = (((i % 30) - 15) * 0.00035);
+    const lngOffset = ((((i * 7) % 30) - 15) * 0.00035);
+
+    // Guaranteed Float values (JS numbers are 64-bit floating point)
+    const lat: number = parseFloat((location.lat + latOffset).toFixed(6));
+    const lng: number = parseFloat((location.lng + lngOffset).toFixed(6));
+
     records.push({
       id: `st_${idNum}`,
       type,
@@ -116,7 +126,9 @@ function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[
       date,
       legal,
       notes: NOTES_TEMPLATES[i % NOTES_TEMPLATES.length],
-      filed: i % 5 !== 0, // ~80% true, 20% false
+      filed: i % 5 !== 0,
+      latitude: lat, // Float
+      longitude: lng, // Float
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * (i * 2)),
     });
   }
@@ -124,9 +136,7 @@ function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[
   return records;
 }
 
-
 export const SEED_DATA: Prisma.StarterRecordCreateInput[] = generateSeedData(1000);
-
 @Injectable()
 export class StarterService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) { }
@@ -265,6 +275,8 @@ export class StarterService implements OnModuleInit {
       pdf: rec.pdf ? (rec.pdf as MatchedRecord['pdf']) : null,
       tier,
       matchedOn,
+      latitude: rec.latitude ?? null,
+      longitude: rec.longitude ?? null,
     });
 
     for (const record of records) {
@@ -327,7 +339,7 @@ export class StarterService implements OnModuleInit {
       }
     }
 
-    return { exact, related };
+    return { exact, nearest: [], related };
   }
 
   // 2. READ ALL

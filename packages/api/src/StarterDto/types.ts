@@ -21,6 +21,8 @@ export interface StarterRecord {
   notes: string;
   filed: boolean;
   createdAt: number;
+  longitude: number | null;
+  latitude: number | null;
   pdf: {
     filename: string;
     originalName: string;
@@ -47,4 +49,15 @@ export type MatchTier = 'exact' | 'related';
 export interface MatchedRecord extends StarterRecord {
   tier: MatchTier;
   matchedOn: string[];
+}
+export interface MapViewProps {
+  exact: MatchedRecord[];
+  related: MatchedRecord[];
+  onOpenRecord: (id: string) => void;
+}
+
+export interface StarterFilterResponse {
+  exact: MatchedRecord[];
+  nearest: MatchedRecord[];
+  related: MatchedRecord[];
 }

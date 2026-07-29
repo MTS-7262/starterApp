@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import Header from '../components/Header';
 import SearchRail from '../components/SearchRail';
 import ResultsPanel from '../components/ResultsPanel';
+import MapView from '../components/MapView';
 import RecordDrawer from '../components/RecordDrawer';
 import NewRecordModal from '../components/NewRecordModal';
 import Toast from '../components/Toast';
@@ -27,6 +28,7 @@ export default function Home() {
   const [exact, setExact] = useState<MatchedRecord[]>([]);
   const [related, setRelated] = useState<MatchedRecord[]>([]);
   const [activeTab, setActiveTab] = useState<MatchTier>('exact');
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid'); // Added View Switch Mode
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [criteria, setCriteria] = useState('');
@@ -98,6 +100,8 @@ export default function Home() {
         legal: rawData.legal ?? '',
         notes: rawData.notes ?? '',
         filed: Boolean(rawData.filed),
+        latitude: rawData.latitude ?? null,
+        longitude: rawData.longitude ?? null,
         createdAt:
           typeof rawData.createdAt === 'number'
             ? rawData.createdAt
@@ -137,16 +141,50 @@ export default function Home() {
             onFileNew={() => setNewModalOpen(true)}
             loading={loading}
           />
-          <ResultsPanel
-            exact={exact}
-            related={related}
-            loading={loading}
-            hasSearched={hasSearched}
-            criteria={criteria}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            onOpenRecord={openRecord}
-          />
+
+          <div className="flex-1 flex flex-col gap-3">
+            {/* View Mode Toggle Bar */}
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`rounded-lg px-3 py-1.5 text-[12px] font-semibold transition ${
+                  viewMode === 'grid'
+                    ? 'bg-teal-600 text-white shadow-md'
+                    : 'border border-[#253342] bg-[#16212b] text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                Grid View
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('map')}
+                className={`rounded-lg px-3 py-1.5 text-[12px] font-semibold transition ${
+                  viewMode === 'map'
+                    ? 'bg-teal-600 text-white shadow-md'
+                    : 'border border-[#253342] bg-[#16212b] text-slate-400 hover:text-slate-100'
+                }`}
+              >
+                Map View
+              </button>
+            </div>
+
+            {/* Display Mode Switcher */}
+            {viewMode === 'grid' ? (
+              <ResultsPanel
+                exact={exact}
+                related={related}
+                loading={loading}
+                hasSearched={hasSearched}
+                criteria={criteria}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                onOpenRecord={openRecord}
+              />
+            ) : (
+              <MapView exact={exact} related={related} onOpenRecord={openRecord} />
+            )}
+          </div>
         </div>
       </div>
 
