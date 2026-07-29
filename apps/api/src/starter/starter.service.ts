@@ -158,12 +158,12 @@ export class StarterService implements OnModuleInit {
       console.log('✅ Starter records successfully seeded into the database.');
     }
   }
-
   async create(data: Prisma.StarterRecordCreateInput): Promise<StarterRecord> {
     return this.prisma.starterRecord.create({
       data,
     });
   }
+
   getApnDifference(apn1: string, apn2: string): number {
     const n1 = parseInt(apn1.replace(/\D/g, ''), 10);
     const n2 = parseInt(apn2.replace(/\D/g, ''), 10);
@@ -193,7 +193,8 @@ export class StarterService implements OnModuleInit {
   }
 
   async filter(query: SearchQuery): Promise<StarterFilterResponse> {
-    if (!query.address &&
+    if (
+      !query.address &&
       !query.apn &&
       !query.owner &&
       !query.subdivision &&
@@ -201,7 +202,8 @@ export class StarterService implements OnModuleInit {
       !query.lot &&
       !query.zip &&
       !query.county &&
-      !query.state) {
+      !query.state
+    ) {
       return { exact: [], nearest: [], related: [] };
     }
 
@@ -213,36 +215,36 @@ export class StarterService implements OnModuleInit {
     if (query.state) where.state = { equals: query.state.trim(), mode: 'insensitive' };
     if (query.county) where.county = { equals: query.county.trim(), mode: 'insensitive' };
     if (query.zip) where.zip = { equals: query.zip.trim(), mode: 'insensitive' };
-    if (apnSearch) where.apn = { contains: apnSearch, mode: 'insensitive' };
-    if (ownerSearch) where.owner = { contains: ownerSearch, mode: 'insensitive' };
     if (query.subdivision) where.subdivision = { contains: query.subdivision.trim(), mode: 'insensitive' };
     if (query.block) where.block = { equals: query.block.trim(), mode: 'insensitive' };
     if (query.lot) where.lot = { equals: query.lot.trim(), mode: 'insensitive' };
     if (query.type && query.type !== 'All') where.type = { equals: query.type, mode: 'insensitive' };
+
+    // Note: Searching by APN prefix (or broad query) allows Prisma to fetch neighboring APNs
+    // if an exact match isn't present in the DB.
+    if (apnSearch) {
+      const apnPrefix = apnSearch.length > 3 ? apnSearch.slice(0, -2) : apnSearch;
+      where.apn = { contains: apnPrefix, mode: 'insensitive' };
+    }
+    if (ownerSearch) {
+      where.owner = { contains: ownerSearch, mode: 'insensitive' };
+    }
 
     const records = await this.prisma.starterRecord.findMany({
       where,
       orderBy: { createdAt: 'desc' },
     });
 
+    if (records.length === 0) {
+      return { exact: [], nearest: [], related: [] };
+    }
+
     const hasApnFilter = Boolean(apnSearch);
     const hasOwnerFilter = Boolean(ownerSearch);
 
-    let closestApnRecord: typeof records[0] | null = null;
-    let minApnDiff = Infinity;
-
-    for (const record of records) {
-      if (hasApnFilter && record.apn) {
-        const diff = this.getApnDifference(record.apn, apnSearch!);
-        if (diff < minApnDiff) {
-          minApnDiff = diff;
-          closestApnRecord = record;
-        }
-      }
-    }
-
     const exact: MatchedRecord[] = [];
-    const relatedCandidates: typeof records = [];
+    const nearest: MatchedRecord[] = [];
+    const related: MatchedRecord[] = [];
 
     const mapToMatchedRecord = (
       rec: typeof records[0],
@@ -279,67 +281,106 @@ export class StarterService implements OnModuleInit {
       longitude: rec.longitude ?? null,
     });
 
-    for (const record of records) {
+    // --------------------------------------------------------------------------
+    // STEP 1: Check for Exact Matches on APN or Owner
+    // --------------------------------------------------------------------------
+    const exactRecords = records.filter((rec) => {
       const isApnExact =
-        hasApnFilter &&
-        record.apn?.trim().toLowerCase() === apnSearch!.toLowerCase();
-
+        hasApnFilter && rec.apn?.trim().toLowerCase() === apnSearch!.toLowerCase();
       const isOwnerExact =
-        hasOwnerFilter &&
-        record.owner?.trim().toLowerCase() === ownerSearch!.toLowerCase();
+        hasOwnerFilter && rec.owner?.trim().toLowerCase() === ownerSearch!.toLowerCase();
 
-      const isClosestApnMatch =
-        hasApnFilter &&
-        !isApnExact &&
-        closestApnRecord &&
-        record.id === closestApnRecord.id;
+      return isApnExact || isOwnerExact;
+    });
 
-      const isExactMatch =
-        (hasApnFilter || hasOwnerFilter)
-          ? (isApnExact || isOwnerExact || isClosestApnMatch)
-          : true;
+    if (exactRecords.length > 0) {
+      exactRecords.forEach((rec) => {
+        const matchedOn: string[] = [];
+        if (hasApnFilter && rec.apn?.trim().toLowerCase() === apnSearch!.toLowerCase()) {
+          matchedOn.push('apn');
+        }
+        if (hasOwnerFilter && rec.owner?.trim().toLowerCase() === ownerSearch!.toLowerCase()) {
+          matchedOn.push('owner');
+        }
+        exact.push(mapToMatchedRecord(rec, 'exact', matchedOn));
+      });
 
-      const matchedOn: string[] = [];
-      if (isApnExact) matchedOn.push('apn');
-      if (isOwnerExact) matchedOn.push('owner');
-      if (isClosestApnMatch) matchedOn.push('closest_apn');
-      if (matchedOn.length === 0) matchedOn.push('query');
+      // Reference point: first exact match
+      const refRecord = exactRecords[0];
+      const exactIds = new Set(exactRecords.map((r) => r.id));
+      const candidateRecords = records.filter((r) => !exactIds.has(r.id));
 
-      if (isExactMatch) {
-        exact.push(mapToMatchedRecord(record, 'exact', matchedOn));
-      } else {
-        relatedCandidates.push(record);
-      }
-    }
-
-    const related: MatchedRecord[] = [];
-    const referenceRecord = exact[0] ?? closestApnRecord;
-
-    const refLat = (referenceRecord as any)?.latitude;
-    const refLng = (referenceRecord as any)?.longitude;
-
-    if (refLat != null && refLng != null) {
-      for (const record of relatedCandidates) {
-        const recLat = (record as any)?.latitude;
-        const recLng = (record as any)?.longitude;
-
-        if (recLat != null && recLng != null) {
-          const distance = this.getDistanceInMeters(refLat, refLng, recLat, recLng);
-          if (distance <= 250) {
-            related.push(
-              mapToMatchedRecord(record, 'related', ['250m_radius']),
+      if (refRecord.latitude != null && refRecord.longitude != null) {
+        for (const rec of candidateRecords) {
+          if (rec.latitude != null && rec.longitude != null) {
+            const distance = this.getDistanceInMeters(
+              refRecord.latitude,
+              refRecord.longitude,
+              rec.latitude,
+              rec.longitude,
             );
+            if (distance <= 250) {
+              related.push(mapToMatchedRecord(rec, 'related', ['250m_radius']));
+            }
           }
         }
       }
-    } else {
 
-      for (const record of relatedCandidates) {
-        related.push(mapToMatchedRecord(record, 'related', ['query']));
+      return { exact, nearest: [], related };
+    }
+
+    // --------------------------------------------------------------------------
+    // STEP 2: Find Nearest APN record (if APN query was provided)
+    // --------------------------------------------------------------------------
+    if (hasApnFilter) {
+      let closestRecord: typeof records[0] | null = null;
+      let minDiff = Infinity;
+
+      for (const rec of records) {
+        if (rec.apn) {
+          const diff = this.getApnDifference(rec.apn, apnSearch!);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestRecord = rec;
+          }
+        }
+      }
+
+      if (closestRecord && minDiff !== Infinity) {
+        nearest.push(mapToMatchedRecord(closestRecord, 'nearest', ['closest_apn']));
+
+        const refRecord = closestRecord;
+        const candidateRecords = records.filter((r) => r.id !== refRecord.id);
+
+        if (refRecord.latitude != null && refRecord.longitude != null) {
+          for (const rec of candidateRecords) {
+            if (rec.latitude != null && rec.longitude != null) {
+              const distance = this.getDistanceInMeters(
+                refRecord.latitude,
+                refRecord.longitude,
+                rec.latitude,
+                rec.longitude,
+              );
+              if (distance <= 250) {
+                related.push(mapToMatchedRecord(rec, 'related', ['250m_radius']));
+              }
+            }
+          }
+        }
+
+        return { exact: [], nearest, related };
       }
     }
 
-    return { exact, nearest: [], related };
+    // --------------------------------------------------------------------------
+    // STEP 3: Fallback Search (No APN/Owner filters or no exact/nearest APN match)
+    // All retrieved records are placed in `related` without radius filtering.
+    // --------------------------------------------------------------------------
+    for (const rec of records) {
+      related.push(mapToMatchedRecord(rec, 'related', ['query']));
+    }
+
+    return { exact: [], nearest: [], related };
   }
 
   // 2. READ ALL

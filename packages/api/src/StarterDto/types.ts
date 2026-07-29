@@ -44,7 +44,7 @@ export interface SearchQuery {
   type?: StarterType | 'All';
 }
 
-export type MatchTier = 'exact' | 'related';
+export type MatchTier = 'exact' | 'related' | 'nearest';
 
 export interface MatchedRecord extends StarterRecord {
   tier: MatchTier;

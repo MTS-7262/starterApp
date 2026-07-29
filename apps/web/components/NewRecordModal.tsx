@@ -1,7 +1,7 @@
 'use client';
 
+import { StarterRecord, StarterType } from '@repo/api';
 import { useState } from 'react';
-import { StarterRecord, StarterType } from '../lib/types';
 
 const empty = {
   type: 'Owner' as StarterType,

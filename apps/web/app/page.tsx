@@ -59,7 +59,7 @@ export default function Home() {
       const data = await res.json();
 
       setExact(data.exact || []);
-      setRelated(data.related || []);
+      setRelated(data.related|| data.nearest || []);
       setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
     } finally {
       setLoading(false);
