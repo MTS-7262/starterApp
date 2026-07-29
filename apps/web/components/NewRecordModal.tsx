@@ -49,7 +49,7 @@ export default function NewRecordModal({
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch('http://localhost:3000/starter', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/starter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

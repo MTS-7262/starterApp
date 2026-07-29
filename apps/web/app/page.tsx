@@ -50,7 +50,7 @@ export default function Home() {
     setCriteria(summarize(query));
     setLastQuery(query);
     try {
-      const res = await fetch('http://localhost:3000/starter/filter', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/starter/filter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(query)
