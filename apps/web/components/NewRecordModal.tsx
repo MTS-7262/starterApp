@@ -60,7 +60,7 @@ export default function NewRecordModal({
     } catch (e: any) {
       setError(e.message);
     } finally {
-      // setSaving(false);
+      setSaving(false);
     }
   }
 
