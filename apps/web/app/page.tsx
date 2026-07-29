@@ -7,8 +7,7 @@ import ResultsPanel from '../components/ResultsPanel';
 import RecordDrawer from '../components/RecordDrawer';
 import NewRecordModal from '../components/NewRecordModal';
 import Toast from '../components/Toast';
-import { MatchedRecord, MatchTier, SearchQuery, StarterRecord } from '../lib/types';
-import { getallTestData, getbyId } from '../lib/db';
+import { MatchedRecord, MatchTier, SearchQuery, StarterRecord, StarterType } from '@repo/api';
 
 function summarize(q: SearchQuery): string {
   const parts: string[] = [];
@@ -49,13 +48,14 @@ export default function Home() {
     setCriteria(summarize(query));
     setLastQuery(query);
     try {
-      const res = await fetch('http://localhost:3000/starter', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      const res = await fetch('http://localhost:3000/starter/filter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(query)
       });
-      
+
       const data = await res.json();
-      
+
       setExact(data.exact || []);
       setRelated(data.related || []);
       setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
@@ -74,11 +74,39 @@ export default function Home() {
   }
 
   async function openRecord(id: string) {
-    // const res = await fetch(`/api/records/${id}`);
-    // const data = await res.json();
+    const records = [...exact, ...related];
+    const rawData = records.find((r) => r.id === id);
 
-    var data= getbyId(id);
-    setDrawerRecord(data);
+    const record: StarterRecord | null = rawData
+      ? {
+        id: rawData.id,
+        type: rawData.type as StarterType,
+        address: rawData.address ?? '',
+        city: rawData.city ?? '',
+        state: rawData.state ?? '',
+        county: rawData.county ?? '',
+        zip: rawData.zip ?? '',
+        apn: rawData.apn ?? '',
+        owner: rawData.owner ?? '',
+        subdivision: rawData.subdivision ?? '',
+        block: rawData.block ?? '',
+        lot: rawData.lot ?? '',
+        titleco: rawData.titleco ?? '',
+        amount: rawData.amount ?? '',
+        policy: rawData.policy ?? '',
+        date: rawData.date ?? '',
+        legal: rawData.legal ?? '',
+        notes: rawData.notes ?? '',
+        filed: Boolean(rawData.filed),
+        createdAt:
+          typeof rawData.createdAt === 'number'
+            ? rawData.createdAt
+            : new Date(rawData.createdAt).getTime(),
+        pdf: rawData.pdf ? (rawData.pdf as StarterRecord['pdf']) : null,
+      }
+      : null;
+
+    setDrawerRecord(record);
   }
 
   function patchRecordInResults(updated: StarterRecord) {

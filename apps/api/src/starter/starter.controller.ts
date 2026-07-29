@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { StarterService } from './starter.service';
 import { Prisma, StarterRecord } from '@repo/database';
+import { SearchQuery, StarterFilterResponse } from '@repo/api';
 
 @Controller('starter')
 export class StarterController {
@@ -19,6 +20,11 @@ export class StarterController {
     @Post('seed')
     seed() {
         return this.starterService.seedDatabase();
+    }
+
+    @Post('filter')
+    async filter(@Body() query: SearchQuery): Promise<StarterFilterResponse> {
+        return await this.starterService.filter(query);
     }
 
     @Post()

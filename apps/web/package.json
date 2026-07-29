@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@repo/api": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
     "next": "16.2.0",
@@ -21,7 +22,6 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@repo/api": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
