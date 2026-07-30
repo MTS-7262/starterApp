@@ -29,6 +29,7 @@ export interface StarterRecord {
     uploadedAt: number;
     size: number;
   } | null;
+  pdfUrl: string | null;
 }
 
 export interface SearchQuery {

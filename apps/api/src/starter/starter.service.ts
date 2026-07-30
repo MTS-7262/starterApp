@@ -8,14 +8,16 @@ import * as path from 'path';
 import { GetDistanceInMeters } from './utils/geo.util';
 import { GetApnDifference } from './utils/apn.util';
 import { FormatZip, ParseBigIntNullable, ParseCityState, ParseFloatNullable } from './utils/parser/starter-parser-util';
+import { S3Service } from 'src/common/s3/s3.service';
 const csv = require('csv-parser');
+import 'multer';
 
 @Injectable()
 export class StarterService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService, private readonly s3Service: S3Service) { }
 
-  async importFromFolder(folderPath: string ) {
-    
+  async importFromFolder(folderPath: string) {
+
     if (!folderPath) {
       throw new BadRequestException('folderPath is required.');
     }
@@ -71,6 +73,35 @@ export class StarterService {
       summary,
     };
   }
+
+  async uploadRecordFile(id: string, file: Express.Multer.File) {
+    await this.findOne(id);
+
+    const { key } = await this.s3Service.uploadFile(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+      'starter-documents',
+    );
+
+    const updatedRecord = await this.prisma.starterRecord.update({
+      where: { id },
+      data: {
+        pdf: key,
+      },
+    });
+
+    const presignedUrl = await this.s3Service.getPresignedUrl(key);
+
+    return {
+      message: 'File uploaded and record updated successfully',
+      key,
+      presignedUrl,
+      record: updatedRecord,
+    };
+  }
+
+
 
   private async importCsvFromPath(filePath: string): Promise<{ file: string; count: number; message: string }> {
     if (!fs.existsSync(filePath)) {
@@ -218,6 +249,7 @@ export class StarterService {
           ? rec.createdAt
           : new Date(rec.createdAt).getTime(),
       pdf: rec.pdf ? (rec.pdf as MatchedRecord['pdf']) : null,
+      pdfUrl: null,
       tier,
       matchedOn,
       latitude: rec.latitude ?? null,
@@ -269,7 +301,7 @@ export class StarterService {
         }
       }
 
-      return { exact, nearest: [], related };
+      return this.enrichWithPresignedUrls({ exact, nearest: [], related });
     }
 
     // --------------------------------------------------------------------------
@@ -311,7 +343,7 @@ export class StarterService {
           }
         }
 
-        return { exact: [], nearest, related };
+        return this.enrichWithPresignedUrls({ exact: [], nearest: [], related });
       }
     }
 
@@ -326,7 +358,30 @@ export class StarterService {
 
     return { exact: [], nearest: [], related };
   }
+  private async enrichWithPresignedUrls(
+    response: StarterFilterResponse,
+  ): Promise<StarterFilterResponse> {
+    const attachUrl = async (record: MatchedRecord): Promise<MatchedRecord> => {
+      // If pdf field exists and holds an S3 key string
+      if (record.pdf && typeof record.pdf === 'string') {
+        try {
+          const pdfUrl = await this.s3Service.getPresignedUrl(record.pdf);
+          return { ...record, pdfUrl };
+        } catch {
+          return record;
+        }
+      }
+      return record;
+    };
 
+    const [exact, nearest, related] = await Promise.all([
+      Promise.all(response.exact.map(attachUrl)),
+      Promise.all(response.nearest.map(attachUrl)),
+      Promise.all(response.related.map(attachUrl)),
+    ]);
+
+    return { exact, nearest, related };
+  }
   // 2. READ ALL
   async findAll(): Promise<StarterRecord[]> {
     return this.prisma.starterRecord.findMany({

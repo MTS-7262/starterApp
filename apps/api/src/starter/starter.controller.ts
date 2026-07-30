@@ -8,10 +8,16 @@ import {
     Delete,
     HttpCode,
     HttpStatus,
+    UseInterceptors,
+    UploadedFile,
+    ParseFilePipe,
+    MaxFileSizeValidator,
+    FileTypeValidator,
 } from '@nestjs/common';
 import { StarterService } from './starter.service';
 import { Prisma, StarterRecord } from '@repo/database';
 import { SearchQuery, StarterFilterResponse } from '@repo/api';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
 
 @Controller('starter')
 export class StarterController {
@@ -48,6 +54,24 @@ export class StarterController {
         @Body() data: Prisma.StarterRecordUpdateInput,
     ): Promise<StarterRecord> {
         return await this.starterService.update(id, data);
+    }
+
+    @Post(':id/upload')
+    @UseInterceptors(FileInterceptor('file'))
+    async uploadFile(
+        @Param('id') id: string,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+                    new FileTypeValidator({ fileType: /(pdf|png|jpg|jpeg)$/i }),
+                ],
+                fileIsRequired: true,
+            }),
+        )
+        file: Express.Multer.File,
+    ) {
+        return this.starterService.uploadRecordFile(id, file);
     }
 
     @Delete(':id')
