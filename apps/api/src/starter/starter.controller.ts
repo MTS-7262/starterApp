@@ -18,8 +18,8 @@ export class StarterController {
     constructor(private readonly starterService: StarterService) { }
 
     @Post('seed')
-    seed(@Body('filePath') filePath: string) {
-        return this.starterService.importCsvFromPath(filePath);
+    seed(@Body('folderPath') folderPath: string) {
+        return this.starterService.importFromFolder(folderPath);
     }
 
     @Post('filter')
@@ -33,7 +33,7 @@ export class StarterController {
     }
 
     @Get()
-   async findAll(): Promise<StarterRecord[]> {
+    async findAll(): Promise<StarterRecord[]> {
         return await this.starterService.findAll();
     }
 

@@ -2,14 +2,78 @@ import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from
 import { MatchedRecord, MatchTier, SearchQuery, StarterFilterResponse, StarterType } from '@repo/api';
 import { Prisma, StarterRecord } from '@repo/database';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fsp from 'fs/promises';
 import * as fs from 'fs';
+import * as path from 'path';
 const csv = require('csv-parser');
 
 @Injectable()
 export class StarterService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async importCsvFromPath(filePath: string): Promise<{ count: number; message: string }> {
+  async importFromFolder(folderPath: string ) {
+    
+    if (!folderPath) {
+      throw new BadRequestException('folderPath is required.');
+    }
+
+    // 1. Verify that the directory exists
+    try {
+      await fsp.access(folderPath);
+    } catch {
+      throw new BadRequestException(`Directory not found: ${folderPath}`);
+    }
+
+    // 2. Read all file names from the directory
+    const dirEntries = await fsp.readdir(folderPath, { withFileTypes: true });
+
+    // 3. Filter to include only CSV files (ignoring subdirectories)
+    const csvFiles = dirEntries
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.csv'))
+      .map((entry) => entry.name);
+
+    if (csvFiles.length === 0) {
+      return {
+        success: true,
+        message: 'No CSV files found in the specified directory.',
+        processedFiles: 0,
+      };
+    }
+
+    const summary = {
+      total: csvFiles.length,
+      successful: 0,
+      failed: 0,
+      details: [] as Array<{ file: string; status: string; error?: string }>,
+    };
+
+    // 4. Loop through each file and process it
+    for (const fileName of csvFiles) {
+      const fullFilePath = path.join(folderPath, fileName);
+
+      try {
+        await await this.importCsvFromPath(fullFilePath);
+
+        summary.successful++;
+        summary.details.push({ file: fileName, status: 'success' });
+      } catch (error: any) {
+        summary.failed++;
+        summary.details.push({
+          file: fileName,
+          status: 'failed',
+          error: error.message || 'Unknown error',
+        });
+      }
+    }
+
+    return {
+      success: true,
+      message: `Completed processing ${summary.total} files.`,
+      summary,
+    };
+  }
+
+  async importCsvFromPath(filePath: string): Promise<{ file: string; count: number; message: string }> {
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException(`File not found at path: ${filePath}`);
     }
@@ -64,6 +128,7 @@ export class StarterService {
       }
 
       return {
+        file: filePath,
         count: totalProcessed,
         message: `Successfully imported ${totalProcessed} records into starter_records table.`,
       };
@@ -182,7 +247,7 @@ export class StarterService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (records.length === 0) 
+    if (records.length === 0)
       return { exact: [], nearest: [], related: [] };
 
     const hasApnFilter = Boolean(apnSearch);
