@@ -33,7 +33,7 @@ function Field({ k, v }: { k: string; v: string }) {
 
 function SectionDivider({ title }: { title: string }) {
   return (
-    <div className="mb-3 mt-6 border-b border-[#253342] pb-1 font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
+    <div className="mb-3 mt-6 border-b border-[#253342] pb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
       {title}
     </div>
   );
@@ -50,7 +50,7 @@ export default function RecordDrawer({
   onClose: () => void;
   onChanged: (r: StarterRecord) => void;
   onDeleted: (id: string) => void;
-  onToast: (msg: string) => void;
+  onToast: (type: 'success' | 'error' | 'info', msg: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0); // <-- Track percentage (0-100)
@@ -116,12 +116,13 @@ export default function RecordDrawer({
           uploadedAt: data.pdf.uploadedAt,
           originalName: data.pdf.originalName,
           size: data.pdf.size,
+          key: data.pdf.key,
         },
         pdfUrl: data.presignedUrl,
       };
 
       onChanged(updatedRecord);
-      onToast('PDF filed against this record.');
+      onToast('success', 'PDF filed against this record.');
     } catch (e: any) {
       setError(e.message || 'Upload failed.');
     } finally {
@@ -131,22 +132,12 @@ export default function RecordDrawer({
     }
   }
 
-  async function removePdf() {
-    if (!confirm('Remove the filed PDF from this record?')) return;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/starter/${record.id}/pdf`, { method: 'DELETE' });
-    const data = await res.json();
-    if (res.ok) {
-      onChanged(data.record);
-      onToast('PDF removed.');
-    }
-  }
-
   async function deleteRecord() {
     if (!confirm('Permanently delete this starter and any filed PDF? This cannot be undone.')) return;
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/starter/${record.id}`, { method: 'DELETE' });
     if (res.ok) {
       onDeleted(record.id);
-      onToast('Starter removed from the vault.');
+      onToast('info', 'Starter removed from the vault.');
     }
   }
 

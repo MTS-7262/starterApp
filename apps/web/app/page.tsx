@@ -37,10 +37,10 @@ export default function Home() {
 
   const [drawerRecord, setDrawerRecord] = useState<StarterRecord | null>(null);
   const [newModalOpen, setNewModalOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{type: 'success' | 'error' | 'info', msg: string | null} | null>(null);
 
-  const showToast = useCallback((msg: string) => {
-    setToast(msg);
+  const showToast = useCallback((type: 'success' | 'error' | 'info', msg: string) => {
+    setToast({type, msg});
     window.clearTimeout((showToast as any)._t);
     (showToast as any)._t = window.setTimeout(() => setToast(null), 2400);
   }, []);
@@ -71,10 +71,6 @@ export default function Home() {
       else if(data.related?.length > 0) {
         setActiveTab('related');
       }
-      
-
-
-      //setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
     } finally {
       setLoading(false);
     }
@@ -231,13 +227,13 @@ export default function Home() {
           onClose={() => setNewModalOpen(false)}
           onCreated={(r) => {
             setNewModalOpen(false);
-            showToast('Starter filed to the vault.');
+            showToast('info', 'Starter filed to the vault.');
             if (lastQuery) runSearch(lastQuery);
           }}
         />
       )}
 
-      <Toast message={toast} />
+      <Toast type={toast?.type || 'success'} message={toast?.msg || null} />
     </main>
   );
 }
