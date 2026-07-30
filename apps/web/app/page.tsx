@@ -26,6 +26,7 @@ function summarize(q: SearchQuery): string {
 
 export default function Home() {
   const [exact, setExact] = useState<MatchedRecord[]>([]);
+  const [nearest, setNearest] = useState<MatchedRecord[]>([]);
   const [related, setRelated] = useState<MatchedRecord[]>([]);
   const [activeTab, setActiveTab] = useState<MatchTier>('exact');
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid'); // Added View Switch Mode
@@ -59,8 +60,21 @@ export default function Home() {
       const data = await res.json();
 
       setExact(data.exact || []);
-      setRelated(data.related|| data.nearest || []);
-      setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
+      setNearest(data.nearest || []);
+      setRelated(data.related || []);
+      if(data.exact?.length > 0) {
+        setActiveTab('exact');
+      }
+      else if(data.nearest?.length > 0) {
+        setActiveTab('nearest');
+      }
+      else if(data.related?.length > 0) {
+        setActiveTab('related');
+      }
+      
+
+
+      //setActiveTab((data.exact || []).length > 0 || (data.related || []).length === 0 ? 'exact' : 'related');
     } finally {
       setLoading(false);
     }
@@ -76,7 +90,7 @@ export default function Home() {
   }
 
   async function openRecord(id: string) {
-    const records = [...exact, ...related];
+    const records = [...exact, ...related,...nearest];
     const rawData = records.find((r) => r.id === id);
 
     const record: StarterRecord | null = rawData
@@ -116,12 +130,14 @@ export default function Home() {
   function patchRecordInResults(updated: StarterRecord) {
     setExact((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
     setRelated((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
+    setNearest((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated } : r)));
     setDrawerRecord((prev) => (prev && prev.id === updated.id ? updated : prev));
   }
 
   function removeRecordFromResults(id: string) {
     setExact((prev) => prev.filter((r) => r.id !== id));
     setRelated((prev) => prev.filter((r) => r.id !== id));
+    setNearest((prev) => prev.filter((r) => r.id !== id));
     setDrawerRecord(null);
   }
 
@@ -174,6 +190,7 @@ export default function Home() {
               <ResultsPanel
                 exact={exact}
                 related={related}
+                nearest={nearest}
                 loading={loading}
                 hasSearched={hasSearched}
                 criteria={criteria}
@@ -182,7 +199,7 @@ export default function Home() {
                 onOpenRecord={openRecord}
               />
             ) : (
-              <MapView exact={exact} related={related} onOpenRecord={openRecord} />
+              <MapView exact={exact} related={related} nearest={nearest} onOpenRecord={openRecord} />
             )}
           </div>
         </div>

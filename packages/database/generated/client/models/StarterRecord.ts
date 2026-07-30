@@ -27,34 +27,32 @@ export type AggregateStarterRecord = {
 }
 
 export type StarterRecordAvgAggregateOutputType = {
+  legalLotNumber: number | null
+  legalDistrict: number | null
   latitude: number | null
   longitude: number | null
 }
 
 export type StarterRecordSumAggregateOutputType = {
+  legalLotNumber: bigint | null
+  legalDistrict: bigint | null
   latitude: number | null
   longitude: number | null
 }
 
 export type StarterRecordMinAggregateOutputType = {
   id: string | null
-  type: string | null
+  owner: string | null
+  apn: string | null
   address: string | null
+  county: string | null
   city: string | null
   state: string | null
-  county: string | null
   zip: string | null
-  apn: string | null
-  owner: string | null
-  subdivision: string | null
-  block: string | null
-  lot: string | null
-  titleco: string | null
-  amount: string | null
-  policy: string | null
-  date: string | null
-  legal: string | null
-  notes: string | null
+  legalUnit: string | null
+  legalLotNumber: bigint | null
+  legalDistrict: bigint | null
+  legalBriefDescription: string | null
   filed: boolean | null
   createdAt: Date | null
   latitude: number | null
@@ -63,23 +61,17 @@ export type StarterRecordMinAggregateOutputType = {
 
 export type StarterRecordMaxAggregateOutputType = {
   id: string | null
-  type: string | null
+  owner: string | null
+  apn: string | null
   address: string | null
+  county: string | null
   city: string | null
   state: string | null
-  county: string | null
   zip: string | null
-  apn: string | null
-  owner: string | null
-  subdivision: string | null
-  block: string | null
-  lot: string | null
-  titleco: string | null
-  amount: string | null
-  policy: string | null
-  date: string | null
-  legal: string | null
-  notes: string | null
+  legalUnit: string | null
+  legalLotNumber: bigint | null
+  legalDistrict: bigint | null
+  legalBriefDescription: string | null
   filed: boolean | null
   createdAt: Date | null
   latitude: number | null
@@ -88,23 +80,17 @@ export type StarterRecordMaxAggregateOutputType = {
 
 export type StarterRecordCountAggregateOutputType = {
   id: number
-  type: number
+  owner: number
+  apn: number
   address: number
+  county: number
   city: number
   state: number
-  county: number
   zip: number
-  apn: number
-  owner: number
-  subdivision: number
-  block: number
-  lot: number
-  titleco: number
-  amount: number
-  policy: number
-  date: number
-  legal: number
-  notes: number
+  legalUnit: number
+  legalLotNumber: number
+  legalDistrict: number
+  legalBriefDescription: number
   filed: number
   createdAt: number
   pdf: number
@@ -116,34 +102,32 @@ export type StarterRecordCountAggregateOutputType = {
 
 
 export type StarterRecordAvgAggregateInputType = {
+  legalLotNumber?: true
+  legalDistrict?: true
   latitude?: true
   longitude?: true
 }
 
 export type StarterRecordSumAggregateInputType = {
+  legalLotNumber?: true
+  legalDistrict?: true
   latitude?: true
   longitude?: true
 }
 
 export type StarterRecordMinAggregateInputType = {
   id?: true
-  type?: true
+  owner?: true
+  apn?: true
   address?: true
+  county?: true
   city?: true
   state?: true
-  county?: true
   zip?: true
-  apn?: true
-  owner?: true
-  subdivision?: true
-  block?: true
-  lot?: true
-  titleco?: true
-  amount?: true
-  policy?: true
-  date?: true
-  legal?: true
-  notes?: true
+  legalUnit?: true
+  legalLotNumber?: true
+  legalDistrict?: true
+  legalBriefDescription?: true
   filed?: true
   createdAt?: true
   latitude?: true
@@ -152,23 +136,17 @@ export type StarterRecordMinAggregateInputType = {
 
 export type StarterRecordMaxAggregateInputType = {
   id?: true
-  type?: true
+  owner?: true
+  apn?: true
   address?: true
+  county?: true
   city?: true
   state?: true
-  county?: true
   zip?: true
-  apn?: true
-  owner?: true
-  subdivision?: true
-  block?: true
-  lot?: true
-  titleco?: true
-  amount?: true
-  policy?: true
-  date?: true
-  legal?: true
-  notes?: true
+  legalUnit?: true
+  legalLotNumber?: true
+  legalDistrict?: true
+  legalBriefDescription?: true
   filed?: true
   createdAt?: true
   latitude?: true
@@ -177,23 +155,17 @@ export type StarterRecordMaxAggregateInputType = {
 
 export type StarterRecordCountAggregateInputType = {
   id?: true
-  type?: true
+  owner?: true
+  apn?: true
   address?: true
+  county?: true
   city?: true
   state?: true
-  county?: true
   zip?: true
-  apn?: true
-  owner?: true
-  subdivision?: true
-  block?: true
-  lot?: true
-  titleco?: true
-  amount?: true
-  policy?: true
-  date?: true
-  legal?: true
-  notes?: true
+  legalUnit?: true
+  legalLotNumber?: true
+  legalDistrict?: true
+  legalBriefDescription?: true
   filed?: true
   createdAt?: true
   pdf?: true
@@ -291,23 +263,17 @@ export type StarterRecordGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type StarterRecordGroupByOutputType = {
   id: string
-  type: string
+  owner: string | null
+  apn: string | null
   address: string | null
+  county: string | null
   city: string | null
   state: string | null
-  county: string | null
   zip: string | null
-  apn: string | null
-  owner: string | null
-  subdivision: string | null
-  block: string | null
-  lot: string | null
-  titleco: string | null
-  amount: string | null
-  policy: string | null
-  date: string | null
-  legal: string | null
-  notes: string | null
+  legalUnit: string | null
+  legalLotNumber: bigint | null
+  legalDistrict: bigint | null
+  legalBriefDescription: string | null
   filed: boolean
   createdAt: Date
   pdf: runtime.JsonValue | null
@@ -341,23 +307,17 @@ export type StarterRecordWhereInput = {
   OR?: Prisma.StarterRecordWhereInput[]
   NOT?: Prisma.StarterRecordWhereInput | Prisma.StarterRecordWhereInput[]
   id?: Prisma.StringFilter<"StarterRecord"> | string
-  type?: Prisma.StringFilter<"StarterRecord"> | string
+  owner?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  apn?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   address?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  county?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   city?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   state?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  county?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   zip?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  apn?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  owner?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  subdivision?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  block?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  lot?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  titleco?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  amount?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  policy?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  date?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  legal?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  notes?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  legalUnit?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  legalLotNumber?: Prisma.BigIntNullableFilter<"StarterRecord"> | bigint | number | null
+  legalDistrict?: Prisma.BigIntNullableFilter<"StarterRecord"> | bigint | number | null
+  legalBriefDescription?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   filed?: Prisma.BoolFilter<"StarterRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StarterRecord"> | Date | string
   pdf?: Prisma.JsonNullableFilter<"StarterRecord">
@@ -368,23 +328,17 @@ export type StarterRecordWhereInput = {
 
 export type StarterRecordOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  owner?: Prisma.SortOrderInput | Prisma.SortOrder
+  apn?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  county?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrderInput | Prisma.SortOrder
-  county?: Prisma.SortOrderInput | Prisma.SortOrder
   zip?: Prisma.SortOrderInput | Prisma.SortOrder
-  apn?: Prisma.SortOrderInput | Prisma.SortOrder
-  owner?: Prisma.SortOrderInput | Prisma.SortOrder
-  subdivision?: Prisma.SortOrderInput | Prisma.SortOrder
-  block?: Prisma.SortOrderInput | Prisma.SortOrder
-  lot?: Prisma.SortOrderInput | Prisma.SortOrder
-  titleco?: Prisma.SortOrderInput | Prisma.SortOrder
-  amount?: Prisma.SortOrderInput | Prisma.SortOrder
-  policy?: Prisma.SortOrderInput | Prisma.SortOrder
-  date?: Prisma.SortOrderInput | Prisma.SortOrder
-  legal?: Prisma.SortOrderInput | Prisma.SortOrder
-  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalLotNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalBriefDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   filed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pdf?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -398,23 +352,17 @@ export type StarterRecordWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.StarterRecordWhereInput | Prisma.StarterRecordWhereInput[]
   OR?: Prisma.StarterRecordWhereInput[]
   NOT?: Prisma.StarterRecordWhereInput | Prisma.StarterRecordWhereInput[]
-  type?: Prisma.StringFilter<"StarterRecord"> | string
+  owner?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  apn?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   address?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  county?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   city?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   state?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  county?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   zip?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  apn?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  owner?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  subdivision?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  block?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  lot?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  titleco?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  amount?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  policy?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  date?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  legal?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
-  notes?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  legalUnit?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
+  legalLotNumber?: Prisma.BigIntNullableFilter<"StarterRecord"> | bigint | number | null
+  legalDistrict?: Prisma.BigIntNullableFilter<"StarterRecord"> | bigint | number | null
+  legalBriefDescription?: Prisma.StringNullableFilter<"StarterRecord"> | string | null
   filed?: Prisma.BoolFilter<"StarterRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StarterRecord"> | Date | string
   pdf?: Prisma.JsonNullableFilter<"StarterRecord">
@@ -425,23 +373,17 @@ export type StarterRecordWhereUniqueInput = Prisma.AtLeast<{
 
 export type StarterRecordOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  owner?: Prisma.SortOrderInput | Prisma.SortOrder
+  apn?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  county?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.SortOrderInput | Prisma.SortOrder
-  county?: Prisma.SortOrderInput | Prisma.SortOrder
   zip?: Prisma.SortOrderInput | Prisma.SortOrder
-  apn?: Prisma.SortOrderInput | Prisma.SortOrder
-  owner?: Prisma.SortOrderInput | Prisma.SortOrder
-  subdivision?: Prisma.SortOrderInput | Prisma.SortOrder
-  block?: Prisma.SortOrderInput | Prisma.SortOrder
-  lot?: Prisma.SortOrderInput | Prisma.SortOrder
-  titleco?: Prisma.SortOrderInput | Prisma.SortOrder
-  amount?: Prisma.SortOrderInput | Prisma.SortOrder
-  policy?: Prisma.SortOrderInput | Prisma.SortOrder
-  date?: Prisma.SortOrderInput | Prisma.SortOrder
-  legal?: Prisma.SortOrderInput | Prisma.SortOrder
-  notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalLotNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrderInput | Prisma.SortOrder
+  legalBriefDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   filed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pdf?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -460,23 +402,17 @@ export type StarterRecordScalarWhereWithAggregatesInput = {
   OR?: Prisma.StarterRecordScalarWhereWithAggregatesInput[]
   NOT?: Prisma.StarterRecordScalarWhereWithAggregatesInput | Prisma.StarterRecordScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"StarterRecord"> | string
-  type?: Prisma.StringWithAggregatesFilter<"StarterRecord"> | string
+  owner?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
+  apn?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
+  county?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
   state?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  county?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
   zip?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  apn?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  owner?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  subdivision?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  block?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  lot?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  titleco?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  amount?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  policy?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  date?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  legal?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
-  notes?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
+  legalUnit?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
+  legalLotNumber?: Prisma.BigIntNullableWithAggregatesFilter<"StarterRecord"> | bigint | number | null
+  legalDistrict?: Prisma.BigIntNullableWithAggregatesFilter<"StarterRecord"> | bigint | number | null
+  legalBriefDescription?: Prisma.StringNullableWithAggregatesFilter<"StarterRecord"> | string | null
   filed?: Prisma.BoolWithAggregatesFilter<"StarterRecord"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StarterRecord"> | Date | string
   pdf?: Prisma.JsonNullableWithAggregatesFilter<"StarterRecord">
@@ -487,23 +423,17 @@ export type StarterRecordScalarWhereWithAggregatesInput = {
 
 export type StarterRecordCreateInput = {
   id?: string
-  type: string
+  owner?: string | null
+  apn?: string | null
   address?: string | null
+  county?: string | null
   city?: string | null
   state?: string | null
-  county?: string | null
   zip?: string | null
-  apn?: string | null
-  owner?: string | null
-  subdivision?: string | null
-  block?: string | null
-  lot?: string | null
-  titleco?: string | null
-  amount?: string | null
-  policy?: string | null
-  date?: string | null
-  legal?: string | null
-  notes?: string | null
+  legalUnit?: string | null
+  legalLotNumber?: bigint | number | null
+  legalDistrict?: bigint | number | null
+  legalBriefDescription?: string | null
   filed?: boolean
   createdAt?: Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -514,23 +444,17 @@ export type StarterRecordCreateInput = {
 
 export type StarterRecordUncheckedCreateInput = {
   id?: string
-  type: string
+  owner?: string | null
+  apn?: string | null
   address?: string | null
+  county?: string | null
   city?: string | null
   state?: string | null
-  county?: string | null
   zip?: string | null
-  apn?: string | null
-  owner?: string | null
-  subdivision?: string | null
-  block?: string | null
-  lot?: string | null
-  titleco?: string | null
-  amount?: string | null
-  policy?: string | null
-  date?: string | null
-  legal?: string | null
-  notes?: string | null
+  legalUnit?: string | null
+  legalLotNumber?: bigint | number | null
+  legalDistrict?: bigint | number | null
+  legalBriefDescription?: string | null
   filed?: boolean
   createdAt?: Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -541,23 +465,17 @@ export type StarterRecordUncheckedCreateInput = {
 
 export type StarterRecordUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subdivision?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  block?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  titleco?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  legal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalLotNumber?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalDistrict?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalBriefDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -568,23 +486,17 @@ export type StarterRecordUpdateInput = {
 
 export type StarterRecordUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subdivision?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  block?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  titleco?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  legal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalLotNumber?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalDistrict?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalBriefDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -595,23 +507,17 @@ export type StarterRecordUncheckedUpdateInput = {
 
 export type StarterRecordCreateManyInput = {
   id?: string
-  type: string
+  owner?: string | null
+  apn?: string | null
   address?: string | null
+  county?: string | null
   city?: string | null
   state?: string | null
-  county?: string | null
   zip?: string | null
-  apn?: string | null
-  owner?: string | null
-  subdivision?: string | null
-  block?: string | null
-  lot?: string | null
-  titleco?: string | null
-  amount?: string | null
-  policy?: string | null
-  date?: string | null
-  legal?: string | null
-  notes?: string | null
+  legalUnit?: string | null
+  legalLotNumber?: bigint | number | null
+  legalDistrict?: bigint | number | null
+  legalBriefDescription?: string | null
   filed?: boolean
   createdAt?: Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -622,23 +528,17 @@ export type StarterRecordCreateManyInput = {
 
 export type StarterRecordUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subdivision?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  block?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  titleco?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  legal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalLotNumber?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalDistrict?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalBriefDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -649,23 +549,17 @@ export type StarterRecordUpdateManyMutationInput = {
 
 export type StarterRecordUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.StringFieldUpdateOperationsInput | string
+  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  county?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   zip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  apn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  owner?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subdivision?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  block?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  lot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  titleco?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  amount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  policy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  date?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  legal?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalUnit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalLotNumber?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalDistrict?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  legalBriefDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   filed?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pdf?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -684,23 +578,17 @@ export type StringNullableListFilter<$PrismaModel = never> = {
 
 export type StarterRecordCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  apn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  county?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  county?: Prisma.SortOrder
   zip?: Prisma.SortOrder
-  apn?: Prisma.SortOrder
-  owner?: Prisma.SortOrder
-  subdivision?: Prisma.SortOrder
-  block?: Prisma.SortOrder
-  lot?: Prisma.SortOrder
-  titleco?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  policy?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  legal?: Prisma.SortOrder
-  notes?: Prisma.SortOrder
+  legalUnit?: Prisma.SortOrder
+  legalLotNumber?: Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrder
+  legalBriefDescription?: Prisma.SortOrder
   filed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   pdf?: Prisma.SortOrder
@@ -710,29 +598,25 @@ export type StarterRecordCountOrderByAggregateInput = {
 }
 
 export type StarterRecordAvgOrderByAggregateInput = {
+  legalLotNumber?: Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
 }
 
 export type StarterRecordMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  apn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  county?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  county?: Prisma.SortOrder
   zip?: Prisma.SortOrder
-  apn?: Prisma.SortOrder
-  owner?: Prisma.SortOrder
-  subdivision?: Prisma.SortOrder
-  block?: Prisma.SortOrder
-  lot?: Prisma.SortOrder
-  titleco?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  policy?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  legal?: Prisma.SortOrder
-  notes?: Prisma.SortOrder
+  legalUnit?: Prisma.SortOrder
+  legalLotNumber?: Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrder
+  legalBriefDescription?: Prisma.SortOrder
   filed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -741,23 +625,17 @@ export type StarterRecordMaxOrderByAggregateInput = {
 
 export type StarterRecordMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  type?: Prisma.SortOrder
+  owner?: Prisma.SortOrder
+  apn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  county?: Prisma.SortOrder
   city?: Prisma.SortOrder
   state?: Prisma.SortOrder
-  county?: Prisma.SortOrder
   zip?: Prisma.SortOrder
-  apn?: Prisma.SortOrder
-  owner?: Prisma.SortOrder
-  subdivision?: Prisma.SortOrder
-  block?: Prisma.SortOrder
-  lot?: Prisma.SortOrder
-  titleco?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  policy?: Prisma.SortOrder
-  date?: Prisma.SortOrder
-  legal?: Prisma.SortOrder
-  notes?: Prisma.SortOrder
+  legalUnit?: Prisma.SortOrder
+  legalLotNumber?: Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrder
+  legalBriefDescription?: Prisma.SortOrder
   filed?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -765,6 +643,8 @@ export type StarterRecordMinOrderByAggregateInput = {
 }
 
 export type StarterRecordSumOrderByAggregateInput = {
+  legalLotNumber?: Prisma.SortOrder
+  legalDistrict?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
 }
@@ -779,6 +659,14 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -806,23 +694,17 @@ export type StarterRecordUpdateexownersInput = {
 
 export type StarterRecordSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  type?: boolean
+  owner?: boolean
+  apn?: boolean
   address?: boolean
+  county?: boolean
   city?: boolean
   state?: boolean
-  county?: boolean
   zip?: boolean
-  apn?: boolean
-  owner?: boolean
-  subdivision?: boolean
-  block?: boolean
-  lot?: boolean
-  titleco?: boolean
-  amount?: boolean
-  policy?: boolean
-  date?: boolean
-  legal?: boolean
-  notes?: boolean
+  legalUnit?: boolean
+  legalLotNumber?: boolean
+  legalDistrict?: boolean
+  legalBriefDescription?: boolean
   filed?: boolean
   createdAt?: boolean
   pdf?: boolean
@@ -833,23 +715,17 @@ export type StarterRecordSelect<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type StarterRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  type?: boolean
+  owner?: boolean
+  apn?: boolean
   address?: boolean
+  county?: boolean
   city?: boolean
   state?: boolean
-  county?: boolean
   zip?: boolean
-  apn?: boolean
-  owner?: boolean
-  subdivision?: boolean
-  block?: boolean
-  lot?: boolean
-  titleco?: boolean
-  amount?: boolean
-  policy?: boolean
-  date?: boolean
-  legal?: boolean
-  notes?: boolean
+  legalUnit?: boolean
+  legalLotNumber?: boolean
+  legalDistrict?: boolean
+  legalBriefDescription?: boolean
   filed?: boolean
   createdAt?: boolean
   pdf?: boolean
@@ -860,23 +736,17 @@ export type StarterRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types
 
 export type StarterRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  type?: boolean
+  owner?: boolean
+  apn?: boolean
   address?: boolean
+  county?: boolean
   city?: boolean
   state?: boolean
-  county?: boolean
   zip?: boolean
-  apn?: boolean
-  owner?: boolean
-  subdivision?: boolean
-  block?: boolean
-  lot?: boolean
-  titleco?: boolean
-  amount?: boolean
-  policy?: boolean
-  date?: boolean
-  legal?: boolean
-  notes?: boolean
+  legalUnit?: boolean
+  legalLotNumber?: boolean
+  legalDistrict?: boolean
+  legalBriefDescription?: boolean
   filed?: boolean
   createdAt?: boolean
   pdf?: boolean
@@ -887,23 +757,17 @@ export type StarterRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
 
 export type StarterRecordSelectScalar = {
   id?: boolean
-  type?: boolean
+  owner?: boolean
+  apn?: boolean
   address?: boolean
+  county?: boolean
   city?: boolean
   state?: boolean
-  county?: boolean
   zip?: boolean
-  apn?: boolean
-  owner?: boolean
-  subdivision?: boolean
-  block?: boolean
-  lot?: boolean
-  titleco?: boolean
-  amount?: boolean
-  policy?: boolean
-  date?: boolean
-  legal?: boolean
-  notes?: boolean
+  legalUnit?: boolean
+  legalLotNumber?: boolean
+  legalDistrict?: boolean
+  legalBriefDescription?: boolean
   filed?: boolean
   createdAt?: boolean
   pdf?: boolean
@@ -912,30 +776,24 @@ export type StarterRecordSelectScalar = {
   exowners?: boolean
 }
 
-export type StarterRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "address" | "city" | "state" | "county" | "zip" | "apn" | "owner" | "subdivision" | "block" | "lot" | "titleco" | "amount" | "policy" | "date" | "legal" | "notes" | "filed" | "createdAt" | "pdf" | "latitude" | "longitude" | "exowners", ExtArgs["result"]["starterRecord"]>
+export type StarterRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "owner" | "apn" | "address" | "county" | "city" | "state" | "zip" | "legalUnit" | "legalLotNumber" | "legalDistrict" | "legalBriefDescription" | "filed" | "createdAt" | "pdf" | "latitude" | "longitude" | "exowners", ExtArgs["result"]["starterRecord"]>
 
 export type $StarterRecordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StarterRecord"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    type: string
+    owner: string | null
+    apn: string | null
     address: string | null
+    county: string | null
     city: string | null
     state: string | null
-    county: string | null
     zip: string | null
-    apn: string | null
-    owner: string | null
-    subdivision: string | null
-    block: string | null
-    lot: string | null
-    titleco: string | null
-    amount: string | null
-    policy: string | null
-    date: string | null
-    legal: string | null
-    notes: string | null
+    legalUnit: string | null
+    legalLotNumber: bigint | null
+    legalDistrict: bigint | null
+    legalBriefDescription: string | null
     filed: boolean
     createdAt: Date
     pdf: runtime.JsonValue | null
@@ -1366,23 +1224,17 @@ export interface Prisma__StarterRecordClient<T, Null = never, ExtArgs extends ru
  */
 export interface StarterRecordFieldRefs {
   readonly id: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly type: Prisma.FieldRef<"StarterRecord", 'String'>
+  readonly owner: Prisma.FieldRef<"StarterRecord", 'String'>
+  readonly apn: Prisma.FieldRef<"StarterRecord", 'String'>
   readonly address: Prisma.FieldRef<"StarterRecord", 'String'>
+  readonly county: Prisma.FieldRef<"StarterRecord", 'String'>
   readonly city: Prisma.FieldRef<"StarterRecord", 'String'>
   readonly state: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly county: Prisma.FieldRef<"StarterRecord", 'String'>
   readonly zip: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly apn: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly owner: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly subdivision: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly block: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly lot: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly titleco: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly amount: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly policy: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly date: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly legal: Prisma.FieldRef<"StarterRecord", 'String'>
-  readonly notes: Prisma.FieldRef<"StarterRecord", 'String'>
+  readonly legalUnit: Prisma.FieldRef<"StarterRecord", 'String'>
+  readonly legalLotNumber: Prisma.FieldRef<"StarterRecord", 'BigInt'>
+  readonly legalDistrict: Prisma.FieldRef<"StarterRecord", 'BigInt'>
+  readonly legalBriefDescription: Prisma.FieldRef<"StarterRecord", 'String'>
   readonly filed: Prisma.FieldRef<"StarterRecord", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"StarterRecord", 'DateTime'>
   readonly pdf: Prisma.FieldRef<"StarterRecord", 'Json'>
@@ -1588,7 +1440,7 @@ export type StarterRecordCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * The data needed to create a StarterRecord.
    */
-  data: Prisma.XOR<Prisma.StarterRecordCreateInput, Prisma.StarterRecordUncheckedCreateInput>
+  data?: Prisma.XOR<Prisma.StarterRecordCreateInput, Prisma.StarterRecordUncheckedCreateInput>
 }
 
 /**

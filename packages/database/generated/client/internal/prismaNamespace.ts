@@ -532,23 +532,17 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const StarterRecordScalarFieldEnum = {
   id: 'id',
-  type: 'type',
+  owner: 'owner',
+  apn: 'apn',
   address: 'address',
+  county: 'county',
   city: 'city',
   state: 'state',
-  county: 'county',
   zip: 'zip',
-  apn: 'apn',
-  owner: 'owner',
-  subdivision: 'subdivision',
-  block: 'block',
-  lot: 'lot',
-  titleco: 'titleco',
-  amount: 'amount',
-  policy: 'policy',
-  date: 'date',
-  legal: 'legal',
-  notes: 'notes',
+  legalUnit: 'legalUnit',
+  legalLotNumber: 'legalLotNumber',
+  legalDistrict: 'legalDistrict',
+  legalBriefDescription: 'legalBriefDescription',
   filed: 'filed',
   createdAt: 'createdAt',
   pdf: 'pdf',
@@ -618,6 +612,20 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
     
 
 

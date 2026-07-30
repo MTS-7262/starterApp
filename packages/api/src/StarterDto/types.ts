@@ -53,6 +53,7 @@ export interface MatchedRecord extends StarterRecord {
 export interface MapViewProps {
   exact: MatchedRecord[];
   related: MatchedRecord[];
+  nearest: MatchedRecord[];
   onOpenRecord: (id: string) => void;
 }
 

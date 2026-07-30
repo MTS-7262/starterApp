@@ -1,9 +1,10 @@
 'use client';
 
-export type StampTone = 'exact' | 'related' | 'filed' | 'pending' | 'neutral';
+export type StampTone = 'exact' | 'nearest' | 'related' | 'filed' | 'pending' | 'neutral';
 
 const TONE_STYLES: Record<StampTone, string> = {
   exact: 'bg-teal-950/80 text-teal-300 border-teal-500/30',
+  nearest: 'bg-blue-950/80 text-blue-300 border-blue-500/30',
   related: 'bg-sky-950/80 text-sky-300 border-sky-500/30',
   filed: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/30',
   pending: 'bg-amber-950/80 text-amber-300 border-amber-500/30',
@@ -12,6 +13,7 @@ const TONE_STYLES: Record<StampTone, string> = {
 
 const DOT_STYLES: Record<StampTone, string> = {
   exact: 'bg-teal-400 shadow-[0_0_6px_#2dd4bf]',
+  nearest: 'bg-blue-400 shadow-[0_0_6px_#38bdf8]',  
   related: 'bg-sky-400 shadow-[0_0_6px_#38bdf8]',
   filed: 'bg-emerald-400 shadow-[0_0_6px_#34d399]',
   pending: 'bg-amber-400 shadow-[0_0_6px_#fbbf24]',

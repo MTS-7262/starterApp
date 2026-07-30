@@ -23,6 +23,7 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@repo/api": "workspace:*",
     "@repo/database": "workspace:*",
+    "csv-parser": "^3.2.1",
     "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
     "pg": "^8.22.0",

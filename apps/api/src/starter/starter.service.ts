@@ -1,163 +1,116 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { MatchedRecord, MatchTier, SearchQuery, StarterFilterResponse, StarterType } from '@repo/api';
 import { Prisma, StarterRecord } from '@repo/database';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as fs from 'fs';
+const csv = require('csv-parser');
 
-const FIRST_NAMES = [
-  'Marguerite', 'Theo', 'Priya', 'Declan', 'Owen', 'Sarah', 'Marcus', 'Elena',
-  'David', 'Sophia', 'James', 'Aisha', 'Carlos', 'Emily', 'Vikram', 'Rachel',
-  'Julian', 'Nora', 'Alexander', 'Maya'
-];
-
-const LAST_NAMES = [
-  'Alvante', 'Kestrel', 'Marchetti', 'Falk', 'Chen', 'Vargas', "O'Connor",
-  'Patel', 'Washington', 'Kim', 'Gallagher', 'Novak', 'Gupta', 'Sinclair',
-  'Reynolds', 'Mercer', 'Zhao', 'Thorne'
-];
-
-// Base coordinates typed as floats (number)
-const LOCATIONS: { city: string; county: string; zip: string; lat: number; lng: number }[] = [
-  { city: 'Kirkland', county: 'King', zip: '98033', lat: 47.6768, lng: -122.2060 },
-  { city: 'Bellevue', county: 'King', zip: '98004', lat: 47.6101, lng: -122.2015 },
-  { city: 'Seattle', county: 'King', zip: '98101', lat: 47.6062, lng: -122.3321 },
-  { city: 'Redmond', county: 'King', zip: '98052', lat: 47.6740, lng: -122.1215 },
-  { city: 'Renton', county: 'King', zip: '98055', lat: 47.4829, lng: -122.2171 },
-  { city: 'Tacoma', county: 'Pierce', zip: '98402', lat: 47.2529, lng: -122.4443 },
-  { city: 'Bothell', county: 'Snohomish', zip: '98012', lat: 47.7601, lng: -122.2054 },
-  { city: 'Woodinville', county: 'King', zip: '98072', lat: 47.7543, lng: -122.0800 },
-];
-
-const STREET_NAMES = [
-  'Rose Hill Ave', 'Harborview Dr', 'Overlook Ct', 'Crestview Way', 'Main St',
-  'Bellevue Way', 'Lake Washington Blvd', 'Highland Dr', 'Pine St', 'Forest Ln',
-  'Maple Ave', 'Summit Ridge Blvd', 'Viewridge Dr'
-];
-
-const SUBDIVISIONS = [
-  'Encore at Rose Hill', 'Harborview Terrace', 'Overlook Estates',
-  'Highland Park', 'Evergreen Ridge', 'Sunset Valley', 'Cascade Heights',
-  'Pinecrest Crest'
-];
-
-const TITLE_COMPANIES = [
-  'Cascade Title & Escrow', 'Pacific Rim Title', 'Evergreen Title Co.',
-  'Northwest Escrow & Title', 'First American Title', 'Old Republic Title'
-];
-
-const NOTES_TEMPLATES = [
-  'Schedule B: Easement for public utilities per instrument.',
-  'Deed of trust in favor of Meridian Home Lending.',
-  'Pending: satisfaction of prior deed of trust required prior to close.',
-  'Held in trust; successor trustee documentation on file.',
-  'Refinance; prior deed of trust reconveyed.',
-  'Standard owner policy coverage without exceptions.',
-  'Subject to CC&Rs recorded under King County recording no.'
-];
-
-function getRandom<T>(list: T[]): T {
-  return list[Math.floor(Math.random() * list.length)];
-}
-
-function generateSeedData(count: number = 500): Prisma.StarterRecordCreateInput[] {
-  const records: Prisma.StarterRecordCreateInput[] = [];
-
-  for (let i = 1; i <= count; i++) {
-    const idNum = 1000 + i;
-    const location = getRandom(LOCATIONS);
-    const streetNum = Math.floor(Math.random() * 8999) + 1000;
-    const address = `${streetNum} ${getRandom(STREET_NAMES)}`;
-
-    const types: ('Owner' | 'Lender' | 'Commitment')[] = ['Owner', 'Lender', 'Commitment'];
-    const type = types[i % 3];
-
-    const year = 2020 + (i % 6);
-    const monthNum = (i % 12) + 1;
-    const dayNum = (i % 28) + 1;
-    const monthStr = String(monthNum).padStart(2, '0');
-    const dayStr = String(dayNum).padStart(2, '0');
-    const date = `${year}-${monthStr}-${dayStr}`;
-
-    const prefixMap = { Owner: 'OP', Lender: 'LP', Commitment: 'CM' };
-    const policy = `${prefixMap[type]}-${year}-${10000 + ((i * 137) % 89999)}`;
-
-    const isJoint = i % 4 === 0;
-    const ownerName = isJoint
-      ? `${getRandom(FIRST_NAMES)} & ${getRandom(FIRST_NAMES)} ${getRandom(LAST_NAMES)}`
-      : `${getRandom(FIRST_NAMES)} ${getRandom(LAST_NAMES)}`;
-
-    const block = String((i % 8) + 1);
-    const lot = String((i % 25) + 1);
-    const subdivision = getRandom(SUBDIVISIONS);
-
-    const apnPart1 = Math.floor(100000 + (i * 311) % 899999);
-    const apnPart2 = Math.floor(1000 + (i * 577) % 8999);
-    const apn = `${apnPart1}-${apnPart2}`;
-
-    const rawAmount = (Math.floor((i * 47) % 2500) + 450) * 1000;
-    const amount = rawAmount.toLocaleString('en-US');
-
-    const recNo = `${year}${monthStr}${dayStr}${String(100000 + ((i * 73) % 899999))}`;
-    const legal = `Lot ${lot}, Block ${block}, ${subdivision}, according to the plat thereof recorded under Recording No. ${recNo}, records of ${location.county} County, Washington.`;
-
-    // Calculate float offsets (~30-50m parcel gaps)
-    const latOffset = (((i % 30) - 15) * 0.00035);
-    const lngOffset = ((((i * 7) % 30) - 15) * 0.00035);
-
-    // Guaranteed Float values (JS numbers are 64-bit floating point)
-    const lat: number = parseFloat((location.lat + latOffset).toFixed(6));
-    const lng: number = parseFloat((location.lng + lngOffset).toFixed(6));
-
-    records.push({
-      id: `st_${idNum}`,
-      type,
-      address,
-      city: location.city,
-      state: 'WA',
-      county: location.county,
-      zip: location.zip,
-      apn,
-      owner: ownerName,
-      subdivision,
-      block,
-      lot,
-      titleco: getRandom(TITLE_COMPANIES),
-      amount,
-      policy,
-      date,
-      legal,
-      notes: NOTES_TEMPLATES[i % NOTES_TEMPLATES.length],
-      filed: i % 5 !== 0,
-      latitude: lat, // Float
-      longitude: lng, // Float
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * (i * 2)),
-    });
-  }
-
-  return records;
-}
-
-export const SEED_DATA: Prisma.StarterRecordCreateInput[] = generateSeedData(1000);
 @Injectable()
-export class StarterService implements OnModuleInit {
+export class StarterService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async onModuleInit() {
-    await this.seedDatabase();
-  }
+  async importCsvFromPath(filePath: string): Promise<{ count: number; message: string }> {
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException(`File not found at path: ${filePath}`);
+    }
 
-  async seedDatabase() {
-    const count = await this.prisma.starterRecord.count();
-    if (count === 0) {
-      for (const record of SEED_DATA) {
-        await this.prisma.starterRecord.upsert({
-          where: { id: record.id },
-          update: {},
-          create: record,
-        });
+    const BATCH_SIZE = 2000;
+    let batch: any[] = [];
+    let totalProcessed = 0;
+
+    const stream = fs.createReadStream(filePath).pipe(csv());
+
+    try {
+      for await (const row of stream) {
+        const { city, state } = this.parseCityState(row['Site Address City/State']);
+
+        const record = {
+          owner: row['Owner Name2']?.trim() || null,
+          apn: row['Parcel Number']?.trim() || null,
+          county: row['County']?.trim() || null,
+          address: row['Full Site Address']?.trim() || null,
+          latitude: this.parseFloatNullable(row['Latitude']),
+          longitude: this.parseFloatNullable(row['Longitude']),
+          legalBriefDescription: row['Legal Brief Description']?.trim() || null,
+          legalDistrict: this.parseBigIntNullable(row['Legal District']),
+          legalLotNumber: this.parseBigIntNullable(row['Legal Lot Number']),
+          legalUnit: row['Legal Unit']?.trim() || null,
+          city,
+          state,
+          zip: this.formatZip(row['Site Address Zip']),
+          filed: false,
+        };
+
+        batch.push(record);
+
+        // Process batch when size limit is reached
+        if (batch.length >= BATCH_SIZE) {
+          await this.prisma.starterRecord.createMany({
+            data: batch,
+            skipDuplicates: true,
+          });
+          totalProcessed += batch.length;
+          batch = [];
+        }
       }
-      console.log('✅ Starter records successfully seeded into the database.');
+
+      // Insert any remaining records
+      if (batch.length > 0) {
+        await this.prisma.starterRecord.createMany({
+          data: batch,
+          skipDuplicates: true,
+        });
+        totalProcessed += batch.length;
+      }
+
+      return {
+        count: totalProcessed,
+        message: `Successfully imported ${totalProcessed} records into starter_records table.`,
+      };
+    } catch (error: any) {
+      throw new BadRequestException(`Failed to process CSV file: ${error.message}`);
     }
   }
+  private parseCityState(rawVal?: string): { city: string | null; state: string | null } {
+    if (!rawVal || !rawVal.trim()) return { city: null, state: null };
+    const trimmed = rawVal.trim();
+
+    const match = trimmed.match(/^(.*?)(?:\s+([A-Za-z]{2}))?$/);
+    if (match) {
+      let city = match[1]?.trim() || null;
+      let state = match[2]?.trim() || null;
+
+      if (city && !state && city.length === 2) {
+        state = city;
+        city = null;
+      }
+      return { city, state };
+    }
+    return { city: trimmed, state: null };
+  }
+
+  private parseBigIntNullable(rawVal?: any): bigint | null {
+    if (rawVal === undefined || rawVal === null || rawVal === '') return null;
+    const numStr = String(rawVal).trim().split('.')[0];
+    if (!numStr || isNaN(Number(numStr))) return null;
+    try {
+      return BigInt(numStr);
+    } catch {
+      return null;
+    }
+  }
+
+  private parseFloatNullable(rawVal?: any): number | null {
+    if (rawVal === undefined || rawVal === null || rawVal === '') return null;
+    const parsed = parseFloat(String(rawVal));
+    return isNaN(parsed) ? null : parsed;
+  }
+
+  private formatZip(rawVal?: any): string | null {
+    if (!rawVal) return null;
+    return String(rawVal).trim().replace(/\.0$/, '');
+  }
+
   async create(data: Prisma.StarterRecordCreateInput): Promise<StarterRecord> {
     return this.prisma.starterRecord.create({
       data,
@@ -203,31 +156,25 @@ export class StarterService implements OnModuleInit {
       !query.zip &&
       !query.county &&
       !query.state
-    ) {
+    )
       return { exact: [], nearest: [], related: [] };
-    }
 
     const where: Prisma.StarterRecordWhereInput = {};
     const apnSearch = query.apn?.trim();
-    const ownerSearch = query.owner?.trim();
+    const addressSearch = query.address?.trim();
 
     if (query.address) where.address = { contains: query.address.trim(), mode: 'insensitive' };
     if (query.state) where.state = { equals: query.state.trim(), mode: 'insensitive' };
     if (query.county) where.county = { equals: query.county.trim(), mode: 'insensitive' };
     if (query.zip) where.zip = { equals: query.zip.trim(), mode: 'insensitive' };
-    if (query.subdivision) where.subdivision = { contains: query.subdivision.trim(), mode: 'insensitive' };
-    if (query.block) where.block = { equals: query.block.trim(), mode: 'insensitive' };
-    if (query.lot) where.lot = { equals: query.lot.trim(), mode: 'insensitive' };
-    if (query.type && query.type !== 'All') where.type = { equals: query.type, mode: 'insensitive' };
+    if (query.owner) where.owner = { contains: query.owner.trim(), mode: 'insensitive' };
 
-    // Note: Searching by APN prefix (or broad query) allows Prisma to fetch neighboring APNs
-    // if an exact match isn't present in the DB.
     if (apnSearch) {
       const apnPrefix = apnSearch.length > 3 ? apnSearch.slice(0, -2) : apnSearch;
       where.apn = { contains: apnPrefix, mode: 'insensitive' };
     }
-    if (ownerSearch) {
-      where.owner = { contains: ownerSearch, mode: 'insensitive' };
+    if (addressSearch) {
+      where.address = { contains: addressSearch, mode: 'insensitive' };
     }
 
     const records = await this.prisma.starterRecord.findMany({
@@ -235,12 +182,11 @@ export class StarterService implements OnModuleInit {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (records.length === 0) {
+    if (records.length === 0) 
       return { exact: [], nearest: [], related: [] };
-    }
 
     const hasApnFilter = Boolean(apnSearch);
-    const hasOwnerFilter = Boolean(ownerSearch);
+    const hasAddressFilter = Boolean(addressSearch);
 
     const exact: MatchedRecord[] = [];
     const nearest: MatchedRecord[] = [];
@@ -252,7 +198,7 @@ export class StarterService implements OnModuleInit {
       matchedOn: string[],
     ): MatchedRecord => ({
       id: rec.id,
-      type: rec.type as StarterType,
+      type: "Owner" as StarterType,
       address: rec.address ?? '',
       city: rec.city ?? '',
       state: rec.state ?? '',
@@ -260,15 +206,15 @@ export class StarterService implements OnModuleInit {
       zip: rec.zip ?? '',
       apn: rec.apn ?? '',
       owner: rec.owner ?? '',
-      subdivision: rec.subdivision ?? '',
-      block: rec.block ?? '',
-      lot: rec.lot ?? '',
-      titleco: rec.titleco ?? '',
-      amount: rec.amount ?? '',
-      policy: rec.policy ?? '',
-      date: rec.date ?? '',
-      legal: rec.legal ?? '',
-      notes: rec.notes ?? '',
+      subdivision: '',
+      block: '',
+      lot: '',
+      titleco: '',
+      amount: '',
+      policy: '',
+      date: '',
+      legal: '',
+      notes: '',
       filed: Boolean(rec.filed),
       createdAt:
         typeof rec.createdAt === 'number'
@@ -282,15 +228,15 @@ export class StarterService implements OnModuleInit {
     });
 
     // --------------------------------------------------------------------------
-    // STEP 1: Check for Exact Matches on APN or Owner
+    // STEP 1: Check for Exact Matches on APN or Address
     // --------------------------------------------------------------------------
     const exactRecords = records.filter((rec) => {
       const isApnExact =
         hasApnFilter && rec.apn?.trim().toLowerCase() === apnSearch!.toLowerCase();
-      const isOwnerExact =
-        hasOwnerFilter && rec.owner?.trim().toLowerCase() === ownerSearch!.toLowerCase();
+      const isAddressExact =
+        hasAddressFilter && rec.address?.trim().toLowerCase() === addressSearch!.toLowerCase();
 
-      return isApnExact || isOwnerExact;
+      return isApnExact || isAddressExact;
     });
 
     if (exactRecords.length > 0) {
@@ -299,8 +245,8 @@ export class StarterService implements OnModuleInit {
         if (hasApnFilter && rec.apn?.trim().toLowerCase() === apnSearch!.toLowerCase()) {
           matchedOn.push('apn');
         }
-        if (hasOwnerFilter && rec.owner?.trim().toLowerCase() === ownerSearch!.toLowerCase()) {
-          matchedOn.push('owner');
+        if (hasAddressFilter && rec.address?.trim().toLowerCase() === addressSearch!.toLowerCase()) {
+          matchedOn.push('address');
         }
         exact.push(mapToMatchedRecord(rec, 'exact', matchedOn));
       });
@@ -376,7 +322,8 @@ export class StarterService implements OnModuleInit {
     // STEP 3: Fallback Search (No APN/Owner filters or no exact/nearest APN match)
     // All retrieved records are placed in `related` without radius filtering.
     // --------------------------------------------------------------------------
-    for (const rec of records) {
+    const fallbackRecords = records.slice(0, 10);
+    for (const rec of fallbackRecords) {
       related.push(mapToMatchedRecord(rec, 'related', ['query']));
     }
 

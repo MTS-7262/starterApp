@@ -1,6 +1,6 @@
 'use client';
 
-import { MatchedRecord, MatchTier } from '../lib/types';
+import { MatchedRecord, MatchTier } from '@repo/api';
 import StampBadge from './StampBadge';
 
 function fmtMoney(v: string) {
@@ -38,8 +38,8 @@ function RecordCard({
           </h3>
         </div>
         <StampBadge
-          label={tier === 'exact' ? 'Exact' : 'Related'}
-          tone={tier === 'exact' ? 'exact' : 'related'}
+          label={tier === 'exact' ? 'Exact' :tier=== 'nearest' ? 'Nearest' : 'Related'}
+          tone={tier === 'exact' ? 'exact' : tier === 'nearest' ? 'nearest' : 'related'}
         />
       </div>
 
@@ -101,6 +101,7 @@ function RecordCard({
 export default function ResultsPanel({
   exact,
   related,
+  nearest,
   loading,
   hasSearched,
   criteria,
@@ -110,6 +111,7 @@ export default function ResultsPanel({
 }: {
   exact: MatchedRecord[];
   related: MatchedRecord[];
+  nearest: MatchedRecord[];
   loading: boolean;
   hasSearched: boolean;
   criteria: string;
@@ -117,8 +119,8 @@ export default function ResultsPanel({
   onTabChange: (t: MatchTier) => void;
   onOpenRecord: (id: string) => void;
 }) {
-  const active = activeTab === 'exact' ? exact : related;
-  const total = exact.length + related.length;
+  const active = activeTab === 'exact' ? exact : activeTab === 'related' ? related : nearest;
+  const total = exact.length + related.length + nearest.length;
 
   return (
     <section className="min-w-0 flex-1 rounded-2xl border border-[#293847] bg-[#16212b] shadow-2xl overflow-hidden drop-shadow-[0_0_1px_rgba(45,212,191,0.4)]">
@@ -139,9 +141,9 @@ export default function ResultsPanel({
 
       {/* Tabs Navigation */}
       <div className="flex gap-2 border-b border-[#253342] bg-[#121c25] px-4 pt-1.5">
-        {(['exact', 'related'] as MatchTier[]).map((t) => {
+        {(['exact', 'nearest','related'] as MatchTier[]).map((t) => {
           const isActive = activeTab === t;
-          const count = t === 'exact' ? exact.length : related.length;
+          const count = t === 'exact' ? exact.length : t === 'related' ? related.length : nearest.length;
           return (
             <button
               key={t}
@@ -153,7 +155,7 @@ export default function ResultsPanel({
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span>{t === 'exact' ? 'Exact Matches' : 'Related Records'}</span>
+              <span>{t === 'exact' ? 'Exact Matches' : t === 'nearest' ? 'Nearest Matches' : 'Related Records'}</span>
               <span
                 className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
                   isActive
@@ -164,7 +166,7 @@ export default function ResultsPanel({
                 {count}
               </span>
               {isActive && (
-                <span className="absolute inset-x-0 -bottom-px h-[2px] bg-teal-400 shadow-[0_0_8px_#2dd4bf]" />
+                <span className="absolute inset-x-0 -bottom-px h-0.5 bg-teal-400 shadow-[0_0_8px_#2dd4bf]" />
               )}
             </button>
           );
@@ -172,19 +174,19 @@ export default function ResultsPanel({
       </div>
 
       {/* Main Content Area */}
-      <div className="min-h-[380px] p-5">
+      <div className="min-h-95 p-5">
         {loading ? (
           <div className="grid gap-4 sm:grid-cols-2">
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-[180px] animate-pulse rounded-xl border border-[#253342] bg-[#111a22]"
+                className="h-45 animate-pulse rounded-xl border border-[#253342] bg-[#111a22]"
               />
             ))}
           </div>
         ) : !hasSearched ? (
           /* Initial State */
-          <div className="flex h-[340px] flex-col items-center justify-center text-center">
+          <div className="flex h-85 flex-col items-center justify-center text-center">
             <div className="relative mb-4 flex h-24 w-24 items-center justify-center">
               <div className="absolute inset-0 rounded-full bg-teal-500/10 blur-xl" />
               <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-teal-500/40 bg-[#111a22]">
@@ -196,7 +198,7 @@ export default function ResultsPanel({
             <p className="font-sans text-[16px] font-bold text-slate-100">
               Search the vault to begin
             </p>
-            <p className="mt-1.5 max-w-[340px] text-[13px] leading-relaxed text-slate-400">
+            <p className="mt-1.5 max-w-85 text-[13px] leading-relaxed text-slate-400">
               Enter an address, APN, or legal description on the left. Precise
               identifiers surface exact matches; looser criteria surface
               related starters nearby.
@@ -204,7 +206,7 @@ export default function ResultsPanel({
           </div>
         ) : active.length === 0 ? (
           /* No Results Found State */
-          <div className="flex h-[340px] flex-col items-center justify-center text-center">
+          <div className="flex h-85 flex-col items-center justify-center text-center">
             <div className="relative mb-4 flex h-24 w-24 items-center justify-center">
               <div className="absolute inset-0 rounded-full bg-teal-500/10 blur-xl" />
               <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-teal-500/40 bg-[#111a22]">
@@ -216,7 +218,7 @@ export default function ResultsPanel({
             <p className="font-sans text-[16px] font-bold text-slate-100">
               No {activeTab === 'exact' ? 'exact matches' : 'related records'} found
             </p>
-            <p className="mt-1.5 max-w-[340px] text-[13px] leading-relaxed text-slate-400">
+            <p className="mt-1.5 max-w-85 text-[13px] leading-relaxed text-slate-400">
               {activeTab === 'exact'
                 ? 'Try the Related tab, or file this property as a new starter.'
                 : 'Nothing nearby is filed yet for this search.'}

@@ -18,8 +18,8 @@ export class StarterController {
     constructor(private readonly starterService: StarterService) { }
 
     @Post('seed')
-    seed() {
-        return this.starterService.seedDatabase();
+    seed(@Body('filePath') filePath: string) {
+        return this.starterService.importCsvFromPath(filePath);
     }
 
     @Post('filter')
