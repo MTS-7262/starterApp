@@ -56,15 +56,14 @@ export class StarterController {
         return await this.starterService.update(id, data);
     }
 
-    @Post(':id/upload')
+    @Post(':id/uploadpdf')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(
         @Param('id') id: string,
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
-                    new FileTypeValidator({ fileType: /(pdf|png|jpg|jpeg)$/i }),
+                    new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 })
                 ],
                 fileIsRequired: true,
             }),

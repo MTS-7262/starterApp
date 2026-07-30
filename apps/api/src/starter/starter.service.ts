@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { MatchedRecord, MatchTier, SearchQuery, StarterFilterResponse, StarterType } from '@repo/api';
+import { MatchedRecord, MatchTier, SearchQuery, StarterFilterResponse, StarterType, UploadFileResult } from '@repo/api';
 import { Prisma, StarterRecord } from '@repo/database';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as fsp from 'fs/promises';
@@ -74,7 +74,7 @@ export class StarterService {
     };
   }
 
-  async uploadRecordFile(id: string, file: Express.Multer.File) {
+  async uploadRecordFile(id: string, file: Express.Multer.File): Promise<UploadFileResult> {
     await this.findOne(id);
 
     const { key } = await this.s3Service.uploadFile(
@@ -96,8 +96,7 @@ export class StarterService {
     return {
       message: 'File uploaded and record updated successfully',
       key,
-      presignedUrl,
-      record: updatedRecord,
+      presignedUrl
     };
   }
 
@@ -343,7 +342,7 @@ export class StarterService {
           }
         }
 
-        return this.enrichWithPresignedUrls({ exact: [], nearest: [], related });
+        return this.enrichWithPresignedUrls({ exact: [], nearest: nearest, related });
       }
     }
 

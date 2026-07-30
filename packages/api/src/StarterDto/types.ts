@@ -63,3 +63,10 @@ export interface StarterFilterResponse {
   nearest: MatchedRecord[];
   related: MatchedRecord[];
 }
+
+
+export interface UploadFileResult {
+  message: string;
+  key: string;
+  presignedUrl: string;
+}

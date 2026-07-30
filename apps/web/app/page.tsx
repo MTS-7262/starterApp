@@ -121,6 +121,7 @@ export default function Home() {
             ? rawData.createdAt
             : new Date(rawData.createdAt).getTime(),
         pdf: rawData.pdf ? (rawData.pdf as StarterRecord['pdf']) : null,
+        pdfUrl: rawData.pdfUrl ?? null,
       }
       : null;
 
