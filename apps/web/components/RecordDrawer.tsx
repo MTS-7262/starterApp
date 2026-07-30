@@ -221,6 +221,8 @@ export default function RecordDrawer({
                 <div className="mt-4 flex gap-2">
                   <a
                     href={record.pdfUrl || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`flex-1 rounded-lg bg-teal-600 py-2 text-center text-[12.5px] font-semibold text-white shadow-[0_0_12px_rgba(45,212,191,0.25)] transition hover:bg-teal-500 ${
                       !record.pdfUrl ? 'pointer-events-none opacity-50' : ''
                     }`}
@@ -233,13 +235,6 @@ export default function RecordDrawer({
                     className="flex-1 rounded-lg border border-[#253342] bg-[#1e2c3a] py-2 text-[12.5px] font-semibold text-slate-200 transition hover:border-slate-500 disabled:opacity-60"
                   >
                     {uploading ? `Uploading ${uploadProgress}%` : 'Replace'}
-                  </button>
-                  <button
-                    onClick={removePdf}
-                    disabled={uploading}
-                    className="rounded-lg border border-red-500/30 bg-red-950/40 px-3 text-[12.5px] font-semibold text-red-400 transition hover:border-red-500/60 hover:bg-red-900/50 disabled:opacity-60"
-                  >
-                    Remove
                   </button>
                 </div>
               </div>
