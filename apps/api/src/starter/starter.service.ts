@@ -5,6 +5,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as fsp from 'fs/promises';
 import * as fs from 'fs';
 import * as path from 'path';
+import { GetDistanceInMeters } from './utils/geo.util';
+import { GetApnDifference } from './utils/apn.util';
+import { FormatZip, ParseBigIntNullable, ParseCityState, ParseFloatNullable } from './utils/parser/starter-parser-util';
 const csv = require('csv-parser');
 
 @Injectable()
@@ -17,17 +20,14 @@ export class StarterService {
       throw new BadRequestException('folderPath is required.');
     }
 
-    // 1. Verify that the directory exists
     try {
       await fsp.access(folderPath);
     } catch {
       throw new BadRequestException(`Directory not found: ${folderPath}`);
     }
 
-    // 2. Read all file names from the directory
     const dirEntries = await fsp.readdir(folderPath, { withFileTypes: true });
 
-    // 3. Filter to include only CSV files (ignoring subdirectories)
     const csvFiles = dirEntries
       .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.csv'))
       .map((entry) => entry.name);
@@ -47,7 +47,6 @@ export class StarterService {
       details: [] as Array<{ file: string; status: string; error?: string }>,
     };
 
-    // 4. Loop through each file and process it
     for (const fileName of csvFiles) {
       const fullFilePath = path.join(folderPath, fileName);
 
@@ -73,7 +72,7 @@ export class StarterService {
     };
   }
 
-  async importCsvFromPath(filePath: string): Promise<{ file: string; count: number; message: string }> {
+  private async importCsvFromPath(filePath: string): Promise<{ file: string; count: number; message: string }> {
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException(`File not found at path: ${filePath}`);
     }
@@ -86,22 +85,22 @@ export class StarterService {
 
     try {
       for await (const row of stream) {
-        const { city, state } = this.parseCityState(row['Site Address City/State']);
+        const { city, state } = ParseCityState(row['Site Address City/State']);
 
         const record = {
           owner: row['Owner Name2']?.trim() || null,
           apn: row['Parcel Number']?.trim() || null,
           county: row['County']?.trim() || null,
           address: row['Full Site Address']?.trim() || null,
-          latitude: this.parseFloatNullable(row['Latitude']),
-          longitude: this.parseFloatNullable(row['Longitude']),
+          latitude: ParseFloatNullable(row['Latitude']),
+          longitude: ParseFloatNullable(row['Longitude']),
           legalBriefDescription: row['Legal Brief Description']?.trim() || null,
-          legalDistrict: this.parseBigIntNullable(row['Legal District']),
-          legalLotNumber: this.parseBigIntNullable(row['Legal Lot Number']),
+          legalDistrict: ParseBigIntNullable(row['Legal District']),
+          legalLotNumber: ParseBigIntNullable(row['Legal Lot Number']),
           legalUnit: row['Legal Unit']?.trim() || null,
           city,
           state,
-          zip: this.formatZip(row['Site Address Zip']),
+          zip: FormatZip(row['Site Address Zip']),
           filed: false,
         };
 
@@ -136,78 +135,11 @@ export class StarterService {
       throw new BadRequestException(`Failed to process CSV file: ${error.message}`);
     }
   }
-  private parseCityState(rawVal?: string): { city: string | null; state: string | null } {
-    if (!rawVal || !rawVal.trim()) return { city: null, state: null };
-    const trimmed = rawVal.trim();
-
-    const match = trimmed.match(/^(.*?)(?:\s+([A-Za-z]{2}))?$/);
-    if (match) {
-      let city = match[1]?.trim() || null;
-      let state = match[2]?.trim() || null;
-
-      if (city && !state && city.length === 2) {
-        state = city;
-        city = null;
-      }
-      return { city, state };
-    }
-    return { city: trimmed, state: null };
-  }
-
-  private parseBigIntNullable(rawVal?: any): bigint | null {
-    if (rawVal === undefined || rawVal === null || rawVal === '') return null;
-    const numStr = String(rawVal).trim().split('.')[0];
-    if (!numStr || isNaN(Number(numStr))) return null;
-    try {
-      return BigInt(numStr);
-    } catch {
-      return null;
-    }
-  }
-
-  private parseFloatNullable(rawVal?: any): number | null {
-    if (rawVal === undefined || rawVal === null || rawVal === '') return null;
-    const parsed = parseFloat(String(rawVal));
-    return isNaN(parsed) ? null : parsed;
-  }
-
-  private formatZip(rawVal?: any): string | null {
-    if (!rawVal) return null;
-    return String(rawVal).trim().replace(/\.0$/, '');
-  }
 
   async create(data: Prisma.StarterRecordCreateInput): Promise<StarterRecord> {
     return this.prisma.starterRecord.create({
       data,
     });
-  }
-
-  getApnDifference(apn1: string, apn2: string): number {
-    const n1 = parseInt(apn1.replace(/\D/g, ''), 10);
-    const n2 = parseInt(apn2.replace(/\D/g, ''), 10);
-    if (!isNaN(n1) && !isNaN(n2)) {
-      return Math.abs(n1 - n2);
-    }
-    return apn1.toLowerCase() === apn2.toLowerCase() ? 0 : Infinity;
-  }
-
-  getDistanceInMeters(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number {
-    const R = 6371000; // Earth's radius in meters
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
   }
 
   async filter(query: SearchQuery): Promise<StarterFilterResponse> {
@@ -324,7 +256,7 @@ export class StarterService {
       if (refRecord.latitude != null && refRecord.longitude != null) {
         for (const rec of candidateRecords) {
           if (rec.latitude != null && rec.longitude != null) {
-            const distance = this.getDistanceInMeters(
+            const distance = GetDistanceInMeters(
               refRecord.latitude,
               refRecord.longitude,
               rec.latitude,
@@ -349,7 +281,7 @@ export class StarterService {
 
       for (const rec of records) {
         if (rec.apn) {
-          const diff = this.getApnDifference(rec.apn, apnSearch!);
+          const diff = GetApnDifference(rec.apn, apnSearch!);
           if (diff < minDiff) {
             minDiff = diff;
             closestRecord = rec;
@@ -366,7 +298,7 @@ export class StarterService {
         if (refRecord.latitude != null && refRecord.longitude != null) {
           for (const rec of candidateRecords) {
             if (rec.latitude != null && rec.longitude != null) {
-              const distance = this.getDistanceInMeters(
+              const distance = GetDistanceInMeters(
                 refRecord.latitude,
                 refRecord.longitude,
                 rec.latitude,
