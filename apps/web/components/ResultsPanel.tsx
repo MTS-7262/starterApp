@@ -26,11 +26,11 @@ function RecordCard({
       type="button"
       onClick={onOpen}
       style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
-      className="rise-in group relative flex w-full flex-col rounded-xl border border-[#253342] bg-[#111a22] p-4 text-left shadow-lg transition hover:-translate-y-[2px] hover:border-teal-500/50 hover:bg-[#15202b]"
+      className="rise-in group relative flex w-full flex-col rounded-xl border border-[#253342] bg-[#111a22] p-4 text-left shadow-lg transition hover:-translate-y-0.5 hover:border-teal-500/50 hover:bg-[#15202b]"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-slate-400">
             {record.type}
           </div>
           <h3 className="truncate font-sans text-[15px] font-bold leading-snug text-slate-100">

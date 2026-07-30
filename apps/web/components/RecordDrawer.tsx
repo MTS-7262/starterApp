@@ -80,7 +80,8 @@ export default function RecordDrawer({
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const percentComplete = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(percentComplete);
+            const number=Math.floor(Math.random() * 10) + 1; // Random number between 1 and 100
+            setUploadProgress(percentComplete-number); // Update state with percentage
           }
         };
 
