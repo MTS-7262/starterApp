@@ -88,7 +88,7 @@ export default function RecordDrawer({
           let responseJson = {};
           try {
             responseJson = JSON.parse(xhr.responseText);
-          } catch (e) {}
+          } catch (e) { }
 
           if (xhr.status >= 200 && xhr.status < 300) {
             resolve(responseJson);
@@ -96,8 +96,8 @@ export default function RecordDrawer({
             reject(
               new Error(
                 (responseJson as any).message ||
-                  (responseJson as any).error ||
-                  'Upload failed.',
+                (responseJson as any).error ||
+                'Upload failed.',
               ),
             );
           }
@@ -110,7 +110,13 @@ export default function RecordDrawer({
 
       // Merge updated record data and presigned URL
       const updatedRecord = {
-        ...(data.record || record),
+        ...record,
+        pdf: {
+          filename: data.pdf.filename,
+          uploadedAt: data.pdf.uploadedAt,
+          originalName: data.pdf.originalName,
+          size: data.pdf.size,
+        },
         pdfUrl: data.presignedUrl,
       };
 
@@ -223,9 +229,8 @@ export default function RecordDrawer({
                     href={record.pdfUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`flex-1 rounded-lg bg-teal-600 py-2 text-center text-[12.5px] font-semibold text-white shadow-[0_0_12px_rgba(45,212,191,0.25)] transition hover:bg-teal-500 ${
-                      !record.pdfUrl ? 'pointer-events-none opacity-50' : ''
-                    }`}
+                    className={`flex-1 rounded-lg bg-teal-600 py-2 text-center text-[12.5px] font-semibold text-white shadow-[0_0_12px_rgba(45,212,191,0.25)] transition hover:bg-teal-500 ${!record.pdfUrl ? 'pointer-events-none opacity-50' : ''
+                      }`}
                   >
                     View PDF
                   </a>

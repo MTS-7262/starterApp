@@ -6,7 +6,6 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class S3Service {
@@ -29,14 +28,20 @@ export class S3Service {
   async uploadFile(
     fileBuffer: Buffer,
     originalName: string,
+    uniqueId:string,
     mimeType: string,
     folder: string = 'uploads',
   ): Promise<{ key: string }> {
+
+    const fileNameWithoutExtension = originalName.includes('.')
+      ? originalName.substring(0, originalName.lastIndexOf('.'))
+      : originalName;
+      
     const extension = originalName.includes('.')
       ? originalName.split('.').pop()
       : 'bin';
     
-    const key = `${folder}/${uuidv4()}.${extension}`;
+    const key = `${folder}/${fileNameWithoutExtension}-${uniqueId}.${extension}`;
 
     const command = new PutObjectCommand({
       Bucket: this.bucketName,

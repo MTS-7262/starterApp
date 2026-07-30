@@ -28,6 +28,7 @@ export interface StarterRecord {
     originalName: string;
     uploadedAt: number;
     size: number;
+    key: string;
   } | null;
   pdfUrl: string | null;
 }
@@ -69,4 +70,10 @@ export interface UploadFileResult {
   message: string;
   key: string;
   presignedUrl: string;
+  pdf: {
+    filename: string;
+    originalName: string;
+    uploadedAt: number;
+    size: number;
+  } | null;
 }

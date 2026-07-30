@@ -10,6 +10,7 @@ import { GetApnDifference } from './utils/apn.util';
 import { FormatZip, ParseBigIntNullable, ParseCityState, ParseFloatNullable } from './utils/parser/starter-parser-util';
 import { S3Service } from 'src/common/s3/s3.service';
 const csv = require('csv-parser');
+import { v4 as uuidv4 } from 'uuid';
 import 'multer';
 
 @Injectable()
@@ -77,17 +78,29 @@ export class StarterService {
   async uploadRecordFile(id: string, file: Express.Multer.File): Promise<UploadFileResult> {
     await this.findOne(id);
 
+    const uniqueId = `${uuidv4()}`;
     const { key } = await this.s3Service.uploadFile(
       file.buffer,
       file.originalname,
+      uniqueId,
       file.mimetype,
       'starter-documents',
     );
 
+    const pdfData = {
+      filename: `${file.filename}-${uniqueId}`,
+      originalName: file.originalname,
+      uploadedAt: Date.now(),
+      size: file.size,
+      key: key
+    }
+
     const updatedRecord = await this.prisma.starterRecord.update({
       where: { id },
       data: {
-        pdf: key,
+        pdf: {
+          ...pdfData
+        },
       },
     });
 
@@ -96,7 +109,10 @@ export class StarterService {
     return {
       message: 'File uploaded and record updated successfully',
       key,
-      presignedUrl
+      presignedUrl,
+      pdf: {
+        ...pdfData
+      }
     };
   }
 
@@ -362,9 +378,10 @@ export class StarterService {
   ): Promise<StarterFilterResponse> {
     const attachUrl = async (record: MatchedRecord): Promise<MatchedRecord> => {
       // If pdf field exists and holds an S3 key string
-      if (record.pdf && typeof record.pdf === 'string') {
+      if (record.pdf && typeof record.pdf === 'object') {
         try {
-          const pdfUrl = await this.s3Service.getPresignedUrl(record.pdf);
+          var url=record.pdf.key;
+          const pdfUrl = await this.s3Service.getPresignedUrl(url);
           return { ...record, pdfUrl };
         } catch {
           return record;
